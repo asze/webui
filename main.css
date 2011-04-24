@@ -178,7 +178,8 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 /*	overflow: hidden;*/
 }
 
-.line-cont * {
+.line-cont input,
+.line-cont label {
 	vertical-align: middle;
 }
 
@@ -237,18 +238,18 @@ td.disabled, label.disabled, span.disabled, div.disabled {
  * FOLDER-TAB STYLED CONTROLS
  **************************************************/
 
-ul.folder-tabs {
+.folder-tabs {
 	height: 1.9em;
 	list-style: none;
 	text-align: left;
 	white-space: nowrap;
 }
 
-ul.folder-tabs li {
+.folder-tabs li {
 	display: inline;
 }
 
-ul.folder-tabs li a {
+.folder-tabs li > a {
 	-moz-border-radius: 5px 5px 0 0;
 	-webkit-border-radius: 5px 5px 0 0;
 	background-color: #DDDDDD;
@@ -261,12 +262,12 @@ ul.folder-tabs li a {
 	top: 0.3em;
 }
 
-ul.folder-tabs li a:hover {
+.folder-tabs li > a:hover {
 	background-color: #E5E5E5;
 	border-top: 2px solid #0099FF;
 }
 
-ul.folder-tabs li.selected a {
+.folder-tabs .selected > a {
 	background-color: #FFFFFF !important;
 	border: 1px solid #868686;
 	border-bottom: 1px solid #FFFFFF;
@@ -275,24 +276,24 @@ ul.folder-tabs li.selected a {
 	z-index: 50;
 }
 
-ul.folder-tabs li span {
+.folder-tabs li > span {
 	opacity: 0.60;
 }
 
-ul.folder-tabs li.selected span {
+.folder-tabs .selected > span {
 	opacity: 1.00;
 }
 
-ul.folder-tabs li a > span {
+.folder-tabs a > span {
 	padding: 0 10px 3px 10px;
 }
 
-ul.folder-tabs.icon li a > span {
+.folder-tabs.icon a > span {
 	padding-left: 26px;
 	position: relative;
 }
 
-ul.folder-tabs.icon li a > span > span {
+.folder-tabs.icon .tabIcon {
 	clip: rect(0 16px 16px 0);
 	left: 0;
 	margin: -8px 5px;
@@ -324,52 +325,49 @@ ul.folder-tabs.icon li a > span > span {
 	width: 1px;
 }
 
-#mainToolbar .tbbutton {
+#mainToolbar a.tbbutton {
 	cursor: pointer;
 	display: block;
 	float: left;
 	height: 24px;
 	margin: 3px 4px;
+	opacity: 0.80;
 	width: 24px;
 }
 
-#mainToolbar .tbbutton:active {
+#mainToolbar a.tbbutton:active {
 	margin: 4px 3px 5px 5px;
 }
 
-#mainToolbar .tbbutton {
-	opacity: 0.80;
-}
-
-#mainToolbar .tbbutton:hover {
+#mainToolbar a.tbbutton:hover {
 	opacity: 1.00;
 }
 
-#mainToolbar .tbbutton {
+#mainToolbar a.tbbutton {
 	background: transparent url(./images/toolbar.png) no-repeat 0px top;
 }
 
-	#mainToolbar .tbbutton#add { background-position: 0px; }
-	#mainToolbar .tbbutton#addurl { background-position: -24px; }
-	#mainToolbar .tbbutton#remove { background-position: -72px; }
-	#mainToolbar .tbbutton#start { background-position: -96px; }
-	#mainToolbar .tbbutton#pause { background-position: -120px; }
-	#mainToolbar .tbbutton#stop { background-position: -144px; }
-	#mainToolbar .tbbutton#queueup { background-position: -168px; }
-	#mainToolbar .tbbutton#queuedown { background-position: -192px; }
-	#mainToolbar .tbbutton#rssdownloader { background-position: -240px; }
-	#mainToolbar .tbbutton#setting { background-position: -264px; }
+	#mainToolbar a.tbbutton#add { background-position: 0px; }
+	#mainToolbar a.tbbutton#addurl { background-position: -24px; }
+	#mainToolbar a.tbbutton#remove { background-position: -72px; }
+	#mainToolbar a.tbbutton#start { background-position: -96px; }
+	#mainToolbar a.tbbutton#pause { background-position: -120px; }
+	#mainToolbar a.tbbutton#stop { background-position: -144px; }
+	#mainToolbar a.tbbutton#queueup { background-position: -168px; }
+	#mainToolbar a.tbbutton#queuedown { background-position: -192px; }
+	#mainToolbar a.tbbutton#rssdownloader { background-position: -240px; }
+	#mainToolbar a.tbbutton#setting { background-position: -264px; }
 
-#mainToolbar .tbbutton.disabled {
+#mainToolbar a.tbbutton.disabled {
 	cursor: default;
 	opacity: 0.10;
 }
 
-#mainToolbar .tbbutton.disabled:active {
+#mainToolbar a.tbbutton.disabled:active {
 	margin: 3px 4px;
 }
 
-#mainToolbar #tbchevron {
+#mainToolbar a#tbchevron {
 	display: none;
 	float: right;
 	font-size: 1.2em;
@@ -377,7 +375,7 @@ ul.folder-tabs.icon li a > span > span {
 	opacity: 0.5;
 }
 
-#mainToolbar #tbchevron:hover {
+#mainToolbar a#tbchevron:hover {
 	opacity: 1.0;
 }
 
@@ -388,7 +386,7 @@ ul.folder-tabs.icon li a > span > span {
 	white-space: nowrap;
 }
 
-#mainToolbar-searchbar * {
+#mainToolbar-searchbar > * {
 	border: 1px solid #C0C0C0;
 	float: left;
 	margin: 0 !important;
@@ -445,13 +443,13 @@ ul.folder-tabs.icon li a > span > span {
 	white-space: nowrap;
 }
 
-#mainCatList ul li {
+#mainCatList li {
 	cursor: pointer;
 	padding: 2px 4px 2px 22px;
 	position: relative;
 }
 
-#mainCatList ul li.sel {
+#mainCatList li.sel {
 	background-color: #C0C0C0;
 	color: #FFFFFF;
 }
@@ -463,7 +461,7 @@ ul.folder-tabs.icon li a > span > span {
 	margin: 4px;
 }
 
-#mainCatList ul li .icon {
+#mainCatList li .icon {
 	background: transparent url(./images/tstatus.png) no-repeat;
 	clip: rect(0 16px 16px 0);
 	left: 0;
@@ -514,15 +512,15 @@ ul.folder-tabs.icon li a > span > span {
 	position: absolute; /* NOTE: This fixes tab wrapping on Opera caused by FF/IE reflow fix */
 }
 
-#mainInfoPane-tabs.icon li span span {
+#mainInfoPane-tabs.icon li .tabIcon {
 	background: transparent url(./images/tabs.png) no-repeat;
 }
 
-	.icon li#tab_mainInfoPane-generalTab span span { background-position: 0 0px; }
-	.icon li#tab_mainInfoPane-peersTab span span { background-position: 0 -32px; }
-	.icon li#tab_mainInfoPane-filesTab span span { background-position: 0 -64px; }
-	.icon li#tab_mainInfoPane-speedTab span span { background-position: 0 -80px; }
-	.icon li#tab_mainInfoPane-loggerTab span span { background-position: 0 -96px; }
+	.icon li#tab_mainInfoPane-generalTab .tabIcon { background-position: 0 0px; }
+	.icon li#tab_mainInfoPane-peersTab .tabIcon { background-position: 0 -32px; }
+	.icon li#tab_mainInfoPane-filesTab .tabIcon { background-position: 0 -64px; }
+	.icon li#tab_mainInfoPane-speedTab .tabIcon { background-position: 0 -80px; }
+	.icon li#tab_mainInfoPane-loggerTab .tabIcon { background-position: 0 -96px; }
 
 #mainInfoPane-content {
 	background: #FFFFFF;
@@ -542,18 +540,18 @@ ul.folder-tabs.icon li a > span > span {
 	width: 100%;
 }
 
-#mainInfoPane-generalTab table td {
+#mainInfoPane-generalTab td {
 	empty-cells: show;
 	padding: 1px 3px;
 }
 
-#mainInfoPane-generalTab table td.header {
+#mainInfoPane-generalTab td.header {
 	background: #F6F6F6;
 	border: 1px solid #D0D0D0;
 	font-weight: bold;
 }
 
-#mainInfoPane-generalTab table label {
+#mainInfoPane-generalTab label {
 	width: 8.5em;
 	float: left;
 }
@@ -887,10 +885,6 @@ ul.folder-tabs.icon li a > span > span {
 	z-index: 200;
 }
 
-#mainHDivider:hover, #mainVDivider:hover {
-	background: #CCCCCC;
-}
-
 #mainHDivider {
 	cursor: e-resize;
 	width: 3px;
@@ -974,8 +968,8 @@ ul.folder-tabs.icon li a > span > span {
 	background: transparent url(./images/close.png) no-repeat 0px 0px;
 }
 
-	.dlg-close:hover { background-position: -14px; }
-	.dlg-close:active { background-position: -28px; }
+	a.dlg-close:hover { background-position: -14px; }
+	a.dlg-close:active { background-position: -28px; }
 
 .dlg-foot {
 	background: #F0F0F0;
@@ -1219,7 +1213,7 @@ ul.folder-tabs.icon li a > span > span {
 
 /* Favorites Tab */
 
-#dlgRSSDownloader-filters li input {
+#dlgRSSDownloader-filters input {
 	left: 0;
 	margin: -6px 5px;
 	position: absolute;
@@ -1286,12 +1280,12 @@ ul.folder-tabs.icon li a > span > span {
 	white-space: nowrap;
 }
 
-#dlgSettings-menu li a {
+#dlgSettings-menu li > a {
 	display: block;
 	padding: 2px 6px;
 }
 
-#dlgSettings-menu li.selected a {
+#dlgSettings-menu .selected > a {
 	background-color: #0099FF;
 	color: #FFFFFF;
 }
@@ -1360,9 +1354,9 @@ input[id="proxy.password"] { width: 70px; }
 	width: 100%;
 }
 
-#sched_table * {
+#sched_table td {
 	-webkit-user-select: ignore !important;
-	font-size: 0.95em;
+	font-size: 0.85em;
 	font-weight: bold;
 }
 
@@ -1499,8 +1493,8 @@ NOTE: The following is an ugly hack, but a necessary one if we want the settings
       to remain scalable.
 */
 
-#dlgSettings .dlg-body .stable,
-#dlgSettings .dlg-body .stable div {
+#dlgSettings .stable,
+#dlgSettings .stable div {
 	display: block !important;
 }
 
@@ -1509,7 +1503,7 @@ NOTE: The following is an ugly hack, but a necessary one if we want the settings
  * MENU
  **************************************************/
 
-div.CMenu {
+.CMenu {
 	-moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.30), 0 0 4px rgba(0, 0, 0, 0.20);
 	-webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.30), 0 0 4px rgba(0, 0, 0, 0.20);
 	background: #F8F8F8;
@@ -1521,18 +1515,18 @@ div.CMenu {
 	z-index: 100000;
 }
 
-div.CMenu ul {
+.CMenu ul {
 	background-color: #F8F8F8;
 	list-style: none;
 	padding: 2px;
 	position: relative;
 }
 
-div.CMenu li {
+.CMenu li {
 	word-wrap: break-word;
 }
 
-div.CMenu ul li.sep {
+.CMenu ul li.sep {
 	border-top: 1px solid #D0D0D0;
 	font-size: 0;
 	height: 0;
@@ -1540,20 +1534,20 @@ div.CMenu ul li.sep {
 	margin: 2px 5px;
 }
 
-div.CMenu a {
+.CMenu a {
 	color: #686868;
 	display: block;
 	font-weight: normal;
 	padding: 2px 26px 2px 18px;
 }
 
-div.CMenu a.dis {
+.CMenu a.dis {
 	background-color: #F8F8F8 !important;
 	color: #C0C0C0 !important;
 }
 
-div.CMenu a.exp { background: transparent url(./images/menuexp.png) no-repeat scroll 0 center; }
-div.CMenu a.sel { background: transparent url(./images/menusel.png) no-repeat scroll 5px center; }
-div.CMenu a.check { background: transparent url(./images/menucheck.png) no-repeat scroll 5px center; }
+.CMenu a.exp { background: transparent url(./images/menuexp.png) no-repeat scroll 0 center; }
+.CMenu a.sel { background: transparent url(./images/menusel.png) no-repeat scroll 5px center; }
+.CMenu a.check { background: transparent url(./images/menucheck.png) no-repeat scroll 5px center; }
 
-div.CMenu li:hover > a { background-color: #0099FF; color: #FFFFFF; }
+.CMenu li:hover > a { background-color: #0099FF; color: #FFFFFF; }

@@ -68,7 +68,7 @@ input[type="checkbox"] {
  * SORTABLE TABLE
  **************************************************/
 
-.stable-infobar .refreshBtn span,
+.stable-infobar .refreshIcon,
 .stable-infobar .pageChanger .prevlink,
 .stable-infobar .pageChanger .nextlink {
 	zoom: 1;

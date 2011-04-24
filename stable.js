@@ -305,7 +305,7 @@ var STable = new Class({
 
 		if (this.options.refreshable) {
 			this.infoBar.grab(new Element("div.refreshBtn")
-				.grab(new Element("span")
+				.grab(new Element("span.refreshIcon")
 					.addEvent("click", function(ev) {
 						if ($me.rows)
 							$me.fireEvent("onRefresh");
@@ -316,17 +316,17 @@ var STable = new Class({
 
 		this.pageChanger = new Element("div.pageChanger").inject(this.infoBar);
 
-		this.pagePrev = new Element("span.prevlink.disabled")
+		this.pagePrev = new Element("a.prevlink.disabled")
 			.addEvent("click", this.prevPage.bind(this))
 			.inject(this.pageChanger);
 
-		this.pageSelect = new Element("select")
+		this.pageSelect = new Element("select.pageSelector")
 			.addEvent("change", function() {
 				$me.gotoPage(this.get("value").toInt());
 			})
 			.inject(this.pageChanger);
 
-		this.pageNext = new Element("span.nextlink.disabled")
+		this.pageNext = new Element("a.nextlink.disabled")
 			.addEvent("click", this.nextPage.bind(this))
 			.inject(this.pageChanger);
 
@@ -757,7 +757,7 @@ var STable = new Class({
 
 		col.getElements("span").destroy();
 		col.addClass("sorted").getElement("div").grab(
-			new Element("span." + ((this.options.reverse) ? "desc" : "asc"))
+			new Element("span.sorticon." + ((this.options.reverse) ? "desc" : "asc"))
 		);
 		this.calcSize();
 

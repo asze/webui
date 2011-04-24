@@ -37,7 +37,7 @@ limitations under the License.
 	padding: 1px;
 }
 
-.stable td div {
+.stable td > div {
 	text-overflow: ellipsis !important;
 	overflow: hidden !important;
 }
@@ -71,12 +71,12 @@ limitations under the License.
 	padding-right: 0;
 }
 
-.stable-head .sorted div {
+.stable-head .sorted > div {
 	padding-right: 16px;
 	position: relative;
 }
 
-.stable-head .sorted span {
+.stable-head .sorticon {
 	background: transparent url(./images/arrow.png) no-repeat scroll right -32px;
 	clip: rect(0 16px 16px 0);
 	margin: -8px 0;
@@ -86,11 +86,11 @@ limitations under the License.
 	top: 50%;
 }
 
-.stable-head .sorted span.asc {
+.stable-head .sorticon.asc {
 	background-position: right -16px;
 }
 
-.stable-head .sorted span.desc {
+.stable-head .sorticon.desc {
 	background-position: right 0;
 }
 
@@ -110,16 +110,16 @@ limitations under the License.
 	cursor: pointer;
 }
 
-.stable-body tr.odd td {
+.stable-body tr.odd {
 	background-color: #F2F2F2;
 }
 
-.stable-body tr.even td {
+.stable-body tr.even {
 	background-color: #FFFFFF;
 }
 
 
-.stable-body tr.selected td {
+.stable-body tr.selected {
 	background-color: #C0C0C0 !important;
 	color: #FFFFFF !important;
 }
@@ -201,7 +201,7 @@ limitations under the License.
 	float: right;
 }
 
-.stable-infobar .refreshBtn span {
+.stable-infobar .refreshIcon {
 	padding: 1px 8px 2px;
 	background: transparent url(./images/table_refresh.png) no-repeat scroll center center;
 	cursor: pointer;
@@ -212,34 +212,34 @@ limitations under the License.
 	float: right;
 }
 
-.stable-infobar .pageChanger select {
+.stable-infobar .pageSelector {
 	min-width: 40px;
 }
 
-.stable-infobar .pageChanger .prevlink, .stable-infobar .pageChanger .nextlink {
+.stable-infobar a.prevlink, .stable-infobar a.nextlink {
 	padding: 2px 8px 1px;
 	margin: 0 2px;
 	background: url(./images/nextprev.png) no-repeat;
 	cursor: pointer;
 }
 
-.stable-infobar .pageChanger .prevlink {
+.stable-infobar a.prevlink {
 	background-position: -16px center;
 }
 
-.stable-infobar .pageChanger .nextlink {
+.stable-infobar a.nextlink {
 	background-position: -32px center;
 }
 
-.stable-infobar .pageChanger .prevlink:hover {
+.stable-infobar a.prevlink:hover {
 	background-position: 0px center;
 }
 
-.stable-infobar .pageChanger .nextlink:hover {
+.stable-infobar a.nextlink:hover {
 	background-position: -48px center;
 }
 
-.stable-infobar .pageChanger .disabled {
+.stable-infobar .disabled {
 	opacity: 0.25;
 }
 

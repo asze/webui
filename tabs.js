@@ -57,7 +57,7 @@ var Tabs = new Class({
 					.setProperty("href", "#")
 					.store("showId", id)
 					.adopt(ELE_SPAN.clone(false)
-						.adopt(ELE_SPAN.clone(false))
+						.adopt(ELE_SPAN.clone(false).set("class", "tabIcon"))
 						.appendText(text)
 					)
 				)
