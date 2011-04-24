@@ -469,6 +469,22 @@ var LANG_LIST = {
 	, "zhTW" : "Chinese (Traditional)"
 };
 
-function _(id) {
-	return (LANG_STR[LANG_CONST[id]] || "[ UNRECOGNIZED STRING ID: '" + id + "' ]");
+function _(id, index) {
+	var str = LANG_STR[LANG_CONST[id]];
+
+	if (typeof(str) === 'undefined') {
+		return "[ UNRECOGNIZED STRING ID: '" + id + "' ]";
+	}
+
+	if (typeof(index) === 'number' && index >= 1) {
+		str = str.split("||");
+
+		if (index > str.length) {
+			index = str.length - 1;
+		}
+
+		return str[index];
+	}
+
+	return str;
 }

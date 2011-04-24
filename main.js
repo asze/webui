@@ -1359,26 +1359,26 @@ function loadLangStrings(reload) {
 	utWebUI.trtTable.setConfig({
 		"resetText": _("MENU_RESET"),
 		"colText": {
-			  "name"         : _("OV_COL_NAME")
-			, "order"        : _("OV_COL_ORDER")
-			, "size"         : _("OV_COL_SIZE")
-			, "remaining"    : _("OV_COL_REMAINING")
-			, "done"         : _("OV_COL_DONE")
-			, "status"       : _("OV_COL_STATUS")
-			, "seeds"        : _("OV_COL_SEEDS")
-			, "peers"        : _("OV_COL_PEERS")
-			, "seeds_peers"  : _("OV_COL_SEEDS_PEERS")
-			, "downspeed"    : _("OV_COL_DOWNSPD")
-			, "upspeed"      : _("OV_COL_UPSPD")
-			, "eta"          : _("OV_COL_ETA")
-			, "downloaded"   : _("OV_COL_DOWNLOADED")
-			, "uploaded"     : _("OV_COL_UPPED")
-			, "ratio"        : _("OV_COL_SHARED")
-			, "availability" : _("OV_COL_AVAIL").split("||")[1]
-			, "label"        : _("OV_COL_LABEL")
-			, "added"        : _("OV_COL_DATE_ADDED")
-			, "completed"    : _("OV_COL_DATE_COMPLETED")
-			, "url"          : _("OV_COL_SOURCE_URL")
+			  "name"         : _("OV_COL_NAME", 1)
+			, "order"        : _("OV_COL_ORDER", 1)
+			, "size"         : _("OV_COL_SIZE", 1)
+			, "remaining"    : _("OV_COL_REMAINING", 1)
+			, "done"         : _("OV_COL_DONE", 1)
+			, "status"       : _("OV_COL_STATUS", 1)
+			, "seeds"        : _("OV_COL_SEEDS", 1)
+			, "peers"        : _("OV_COL_PEERS", 1)
+			, "seeds_peers"  : _("OV_COL_SEEDS_PEERS", 1)
+			, "downspeed"    : _("OV_COL_DOWNSPD", 1)
+			, "upspeed"      : _("OV_COL_UPSPD", 1)
+			, "eta"          : _("OV_COL_ETA", 1)
+			, "downloaded"   : _("OV_COL_DOWNLOADED", 1)
+			, "uploaded"     : _("OV_COL_UPPED", 1)
+			, "ratio"        : _("OV_COL_SHARED", 1)
+			, "availability" : _("OV_COL_AVAIL", 1)
+			, "label"        : _("OV_COL_LABEL", 1)
+			, "added"        : _("OV_COL_DATE_ADDED", 1)
+			, "completed"    : _("OV_COL_DATE_COMPLETED", 1)
+			, "url"          : _("OV_COL_SOURCE_URL", 1)
 		}
 	});
 
@@ -1421,24 +1421,24 @@ function loadLangStrings(reload) {
 	utWebUI.prsTable.setConfig({
 		"resetText": _("MENU_RESET"),
 		"colText": {
-			  "ip"         : _("PRS_COL_IP")
-			, "port"       : _("PRS_COL_PORT")
-			, "client"     : _("PRS_COL_CLIENT")
-			, "flags"      : _("PRS_COL_FLAGS")
-			, "pcnt"       : _("PRS_COL_PCNT")
-			, "relevance"  : _("PRS_COL_RELEVANCE")
-			, "downspeed"  : _("PRS_COL_DOWNSPEED")
-			, "upspeed"    : _("PRS_COL_UPSPEED")
-			, "reqs"       : _("PRS_COL_REQS")
-			, "waited"     : _("PRS_COL_WAITED")
-			, "uploaded"   : _("PRS_COL_UPLOADED")
-			, "downloaded" : _("PRS_COL_DOWNLOADED")
-			, "hasherr"    : _("PRS_COL_HASHERR")
-			, "peerdl"     : _("PRS_COL_PEERDL")
-			, "maxup"      : _("PRS_COL_MAXUP")
-			, "maxdown"    : _("PRS_COL_MAXDOWN")
-			, "queued"     : _("PRS_COL_QUEUED")
-			, "inactive"   : _("PRS_COL_INACTIVE")
+			  "ip"         : _("PRS_COL_IP", 1)
+			, "port"       : _("PRS_COL_PORT", 1)
+			, "client"     : _("PRS_COL_CLIENT", 1)
+			, "flags"      : _("PRS_COL_FLAGS", 1)
+			, "pcnt"       : _("PRS_COL_PCNT", 1)
+			, "relevance"  : _("PRS_COL_RELEVANCE", 1)
+			, "downspeed"  : _("PRS_COL_DOWNSPEED", 1)
+			, "upspeed"    : _("PRS_COL_UPSPEED", 1)
+			, "reqs"       : _("PRS_COL_REQS", 1)
+			, "waited"     : _("PRS_COL_WAITED", 1)
+			, "uploaded"   : _("PRS_COL_UPLOADED", 1)
+			, "downloaded" : _("PRS_COL_DOWNLOADED", 1)
+			, "hasherr"    : _("PRS_COL_HASHERR", 1)
+			, "peerdl"     : _("PRS_COL_PEERDL", 1)
+			, "maxup"      : _("PRS_COL_MAXUP", 1)
+			, "maxdown"    : _("PRS_COL_MAXDOWN", 1)
+			, "queued"     : _("PRS_COL_QUEUED", 1)
+			, "inactive"   : _("PRS_COL_INACTIVE", 1)
 		}
 	});
 
@@ -1448,13 +1448,13 @@ function loadLangStrings(reload) {
 	utWebUI.flsTable.setConfig({
 		"resetText": _("MENU_RESET"),
 		"colText": {
-			  "name"    : _("FI_COL_NAME")
-			, "size"    : _("FI_COL_SIZE")
-			, "done"    : _("FI_COL_DONE")
-			, "pcnt"    : _("FI_COL_PCNT")
-			, "firstpc" : _("FI_COL_FIRSTPC")
-			, "numpcs"  : _("FI_COL_NUMPCS")
-			, "prio"    : _("FI_COL_PRIO")
+			  "name"    : _("FI_COL_NAME", 1)
+			, "size"    : _("FI_COL_SIZE", 1)
+			, "done"    : _("FI_COL_DONE", 1)
+			, "pcnt"    : _("FI_COL_PCNT", 1)
+			, "firstpc" : _("FI_COL_FIRSTPC", 1)
+			, "numpcs"  : _("FI_COL_NUMPCS", 1)
+			, "prio"    : _("FI_COL_PRIO", 1)
 		}
 	});
 
@@ -1598,14 +1598,14 @@ function loadLangStrings(reload) {
 	utWebUI.rssfdTable.setConfig({
 		"resetText": _("MENU_RESET"),
 		"colText": {
-			  "fullname" : _("FEED_COL_FULLNAME")
-			, "name"     : _("FEED_COL_NAME")
-			, "episode"  : _("FEED_COL_EPISODE")
-			, "format"   : _("FEED_COL_FORMAT")
-			, "codec"    : _("FEED_COL_CODEC")
-			, "date"     : _("FEED_COL_DATE")
-			, "feed"     : _("FEED_COL_FEED")
-			, "url"      : _("FEED_COL_URL")
+			  "fullname" : _("FEED_COL_FULLNAME", 1)
+			, "name"     : _("FEED_COL_NAME", 1)
+			, "episode"  : _("FEED_COL_EPISODE", 1)
+			, "format"   : _("FEED_COL_FORMAT", 1)
+			, "codec"    : _("FEED_COL_CODEC", 1)
+			, "date"     : _("FEED_COL_DATE", 1)
+			, "feed"     : _("FEED_COL_FEED", 1)
+			, "url"      : _("FEED_COL_URL", 1)
 		}
 	});
 
@@ -1838,8 +1838,8 @@ function loadLangStrings(reload) {
 	utWebUI.advOptTable.setConfig({
 		"resetText": _("MENU_RESET"),
 		"colText": {
-			  "name"  : _("ST_COL_NAME")
-			, "value" : _("ST_COL_VALUE")
+			  "name"  : _("ST_COL_NAME", 1)
+			, "value" : _("ST_COL_VALUE", 1)
 		}
 	});
 
