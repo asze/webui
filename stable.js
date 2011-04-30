@@ -423,26 +423,49 @@ var STable = new Class({
 		this.lastScroll = 0;
 
 		var dBody = this.dBody;
+
+		//--------------------------------------------------
+
+		var updateVirtual = (function() {
+			var dScroll = dBody.scrollTop;
+			if (this.lastScroll !== dScroll) {
+				this.lastScrollUp = (dScroll < this.lastScroll);
+				this.resizePads();
+				this.lastScroll = dScroll;
+			}
+		}).bind(this);
+
+		var badIE = (Browser.ie && Browser.version <= 7);
+		var performScroll = (function(){
+			try {
+				this.dHead.scrollLeft = dBody.scrollLeft;
+
+				if (this.options.mode === MODE_VIRTUAL) {
+					if (badIE) {
+						this.keepScroll(updateVirtual);
+					}
+					else {
+						updateVirtual();
+					}
+				}
+			}
+			catch(e) {}
+
+			this.isScrolling = false;
+		}).bind(this);
+
 		this.scrollEvent = (function() {
 			if (this.isScrolling) return;
 			this.isScrolling = true;
 
-			this.dHead.scrollLeft = dBody.scrollLeft;
+			performScroll.delay(0);
 
-			if (this.options.mode != MODE_PAGE) {
-				var dScroll = dBody.scrollTop;
-				if (this.lastScroll !== dScroll) {
-					this.lastScrollUp = (dScroll < this.lastScroll);
-					this.resizePads();
-					this.lastScroll = dScroll;
-				}
-			}
-
-			this.isScrolling = false;
 			return false;
 		}).bind(this);
 
 		dBody.addEvent("scroll", this.scrollEvent);
+
+		//--------------------------------------------------
 
 		if (this.options.rowsSelectable) {
 			this.dBody.addEvent("mousedown", function(ev) {
@@ -1720,45 +1743,47 @@ var STable = new Class({
 	"resizePads": function() {
 		var resized = false;
 
-		switch (this.options.mode) {
-			case MODE_PAGE:
-				this.dPad.setStyle("height", 0);
-				this.tBody.setStyle("top", 0);
-			break;
+		this.noScrollEvent((function() {
+			switch (this.options.mode) {
+				case MODE_PAGE:
+					this.dPad.setStyle("height", 0);
+					this.tBody.setStyle("top", 0);
+				break;
 
-			case MODE_VIRTUAL:
-				var rHeight = this.tb.rowheight;
-				var pHeight = [this.activeId.visCount, this.activeId.length].pick() * rHeight;
-				var tHeight = (this.options.maxRows * rHeight).min(pHeight);
+				case MODE_VIRTUAL:
+					var rHeight = this.tb.rowheight;
+					var pHeight = [this.activeId.visCount, this.activeId.length].pick() * rHeight;
+					var tHeight = (this.options.maxRows * rHeight).min(pHeight);
 
-				var top = this.dBody.scrollTop;
-				var tHiddenHeight = tHeight - this.dBody.clientHeight;
+					var top = this.dBody.scrollTop;
+					var tHiddenHeight = tHeight - this.dBody.clientHeight;
 
-				top -= (top % tHiddenHeight);
+					top -= (top % tHiddenHeight);
 
-				if (top + tHeight > pHeight) {
-					top  = pHeight - tHeight;
-				}
-				top = top.max(0) || 0;
+					if (top + tHeight > pHeight) {
+						top  = pHeight - tHeight;
+					}
+					top = top.max(0) || 0;
 
-				resized = !(
-					(this.__resizePads_prevTop__ === top) &&
-					(this.__resizePads_prevHeight__ === pHeight)
-				);
-				this.__resizePads_prevTop__ = top;
-				this.__resizePads_prevHeight__ = pHeight;
+					resized = !(
+						(this.__resizePads_prevTop__ === top) &&
+						(this.__resizePads_prevHeight__ === pHeight)
+					);
+					this.__resizePads_prevTop__ = top;
+					this.__resizePads_prevHeight__ = pHeight;
 
-				this.dPad.setStyle("height", pHeight);
-				this.tBody.setStyles({
-					"paddingBottom": (pHeight <= 0 ? 1 : undefined), // Prevent horizontal scrollbar from disappearing
-					"top": top
-				});
-			break;
-		}
+					this.dPad.setStyle("height", pHeight);
+					this.tBody.setStyles({
+						"paddingBottom": (pHeight <= 0 ? 1 : undefined), // Prevent horizontal scrollbar from disappearing
+						"top": top
+					});
+				break;
+			}
 
-		if (resized || this.requiresRefresh) {
-			this.applyFilter();
-		}
+			if (resized || this.requiresRefresh) {
+				this.applyFilter();
+			}
+		}).bind(this));
 
 		return resized;
 	},
