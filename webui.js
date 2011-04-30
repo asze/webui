@@ -1263,7 +1263,7 @@ var utWebUI = {
 				li.getElement(".count").set("text", count);
 			}
 			else {
-				labelList.grab(new Element("li", {"id": labelId})
+				labelList.grab(new Element("li#"+ labelId)
 					.appendText(label + " (")
 					.grab(new Element("span", {"class": "count", "text": count}))
 					.appendText(")")
@@ -1506,8 +1506,7 @@ var utWebUI = {
 			this.refreshSelectedTorGroups();
 
 			if (!isGuest && ev.isRightClick()) {
-				this.trtTable.fillSelection();
-				this.trtTable.fireEvent("onSelect", ev);
+				this.trtTable.selectAll(ev);
 			}
 		}).bind(this);
 
@@ -4148,7 +4147,7 @@ var utWebUI = {
 		// Process menu items
 		// NOTE: Yeah, very nasty code here.
 		if (this.settings["resolve_peerips"]) {
-			menuItems[0].splice(0, 0, CMENU_CHECK);
+			menuItems[0].unshift(CMENU_CHECK);
 		}
 
 		//--------------------------------------------------

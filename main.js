@@ -176,6 +176,7 @@ function setupGlobalEvents() {
 		var keyBindings = {
 			"ctrl a": Function.from(),
 			"ctrl e": Function.from(),
+			"ctrl f": Function.from(),
 
 			"ctrl o": utWebUI.showAddTorrent.bind(utWebUI),
 			"ctrl p": utWebUI.showSettings.bind(utWebUI),

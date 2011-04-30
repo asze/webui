@@ -36,6 +36,9 @@ var MODE_VIRTUAL = 1;
 var NO_CHANGE = 0;
 var HAS_CHANGED = 1;
 
+var MATH_CEIL = Math.ceil;
+var MATH_FLOOR = Math.floor;
+
 var TD = new Element("td");
 var TR = new Element("tr");
 var DIV = new Element("div");
@@ -46,6 +49,23 @@ function simpleClone(element, content) {
 	element.uid = null;
 	$uid(element);
 	return element;
+}
+
+var PBAR =
+	simpleClone(DIV, false).addClass("stable-progress").grab(
+		simpleClone(DIV, false).addClass("stable-progress-bar").grab(
+			simpleClone(DIV, false)
+		)
+	);
+
+function progressBar(pcnt) {
+	var pcntp = pcnt.toFixedNR(1) + "%";
+	var pbar = simpleClone(PBAR, true);
+	(pbar.appendText(pcntp, 'top')
+		.children[0].setStyle('width', pcntp)
+			.children[0].appendText(pcntp, 'top').setStyle('width', (pcnt ? (100 * 100/pcnt).toFixedNR(1) + "%" : 0))
+	);
+	return pbar;
 }
 
 var STable = new Class({
@@ -103,6 +123,8 @@ var STable = new Class({
 	"rowCache": [],
 	"rowModel" : null,
 	"resetText": null,
+	"filterShow": false,
+	"filterQuery": null,
 
 	"create": function(id, columns, options) {
 		this.cols = columns.length;
@@ -132,10 +154,31 @@ var STable = new Class({
 		}
 		this.setOptions(options);
 
+		this.cmp = (function() {
+			var map = {
+				"DEFAULT": function(x, y) {
+					return Comparator.compare(x.v, y.v);
+				}
+			};
+
+			map[TYPE_STRING] =
+				this.sortAlphaNumeric.bind(this);
+
+			map[TYPE_NUMBER] =
+			map[TYPE_NUM_PROGRESS] =
+				this.sortNumeric.bind(this);
+
+			map[TYPE_NUM_ORDER] =
+				this.sortNumOrder.bind(this);
+
+			return map;
+		}).apply(this);
+
 		var badIE = (Browser.ie && Browser.version <= 7);
 		var tr, td, div, $me = this;
 
 		this.id = "stable-" + id;
+		this.idprefix = new RegExp("^" + this.id + "-row-", "")
 		this.dCont = $(id).addClass("stable");
 		this.dHead = simpleClone(DIV, false).addClass("stable-head").inject(this.dCont);
 		this.dBody = simpleClone(DIV, false).addClass("stable-body").inject(this.dCont);
@@ -211,7 +254,7 @@ var STable = new Class({
 			);
 
 			td = simpleClone(TD, false)
-				.grab(new Element("div", {"id": this.id + "-head-" + this.colData[i].id, "text": this.colData[i].text}))
+				.grab(new Element("div#" + this.id + "-head-" + this.colData[i].id, {"text": this.colData[i].text}))
 				.setStyles({"width": this.colHeader[i].width, "display": this.colData[i].disabled ? "none" : ""})
 				.store("index", i)
 				.inject(tr);
@@ -284,8 +327,7 @@ var STable = new Class({
 					ele = ele.getParent("td");
 
 				if (ele) {
-					var idprefix = new RegExp("^" + $me.id + "-row-", "");
-					$me.fireEvent("onDblClick", ele.getParent().id.replace(idprefix, ""));
+					$me.fireEvent("onDblClick", ele.getParent().id.replace($me.idprefix, ""));
 				}
 
 				ev.preventDefault();
@@ -299,9 +341,35 @@ var STable = new Class({
 
 		this.infoBar = simpleClone(DIV, false).addClass("stable-infobar").inject(this.dCont);
 
-		if (this.options.rowsSelectable && this.options.rowMultiSelect) {
-			this.pageInfo = new Element("span.pageInfo", {"text": "0 row(s) selected."}).inject(this.infoBar);
-		}
+		this.filterBar = (new Element("span.filterbar")
+			.appendText("Find:")
+			.grab(new Element("a.filterbar-close", {href: "#"})
+				.addStopEvent("click", this.hideFilterBar.bind(this))
+			)
+			.grab(new Element("input.filterbar-query")
+				.addEvents({
+					"keydown": (function(ev) {
+						var key = eventToKey(ev).trim();
+
+						switch (key) {
+							case "esc":
+								this.hideFilterBar();
+								ev.stop();
+							break;
+						}
+					}).bind(this),
+
+					"keyup": (function(ev) {
+						if (ev.shift || ev.control || ev.alt || ev.meta) return;
+
+						this.applyFilter(ev.target.get("value"));
+					}).bind(this)
+				})
+			)
+			.inject(this.infoBar)
+		);
+
+		this.filterBarQueryInput = this.filterBar.getElement(".filterbar-query");
 
 		if (this.options.refreshable) {
 			this.infoBar.grab(new Element("div.refreshBtn")
@@ -316,19 +384,22 @@ var STable = new Class({
 
 		this.pageChanger = new Element("div.pageChanger").inject(this.infoBar);
 
-		this.pagePrev = new Element("a.prevlink.disabled")
+		this.pagePrev = (new Element("a.prevlink.disabled")
 			.addEvent("click", this.prevPage.bind(this))
-			.inject(this.pageChanger);
+			.inject(this.pageChanger)
+		);
 
-		this.pageSelect = new Element("select.pageSelector")
+		this.pageSelect = (new Element("select.pageSelector")
 			.addEvent("change", function() {
 				$me.gotoPage(this.get("value").toInt());
 			})
-			.inject(this.pageChanger);
+			.inject(this.pageChanger)
+		);
 
-		this.pageNext = new Element("a.nextlink.disabled")
+		this.pageNext = (new Element("a.nextlink.disabled")
 			.addEvent("click", this.nextPage.bind(this))
-			.inject(this.pageChanger);
+			.inject(this.pageChanger)
+		);
 
 		this.assignEvents();
 		this.setAlignment();
@@ -360,30 +431,37 @@ var STable = new Class({
 
 		dBody.addEvent("scroll", this.scrollEvent);
 
-		if (!this.options.rowsSelectable) return;
-
-		this.dCont.addEvent("keydown", (function(ev) {
-			var ctrl = ((Browser.Platform.mac && ev.meta) || (!Browser.Platform.mac && ev.control));
-
-			if (ctrl && (ev.key == "a")) { // Ctrl + A
-				this.fillSelection();
-				this.fireEvent("onSelect", ev);
-			} else if (ctrl && (ev.key == "e")) { // Ctrl + E
-				this.clearSelection();
-				this.fireEvent("onSelect", ev);
-			}
-		}).bind(this));
-
-		this.dCont.addEvent("keydown", (function(ev) {
-			this.fireEvent("onKeyDown", ev);
-		}).bind(this));
-
-//		if (Browser.firefox) {
-			// http://n2.nabble.com/key-events-not-firing-on-div-in-FF--td663136.html
+		if (this.options.rowsSelectable) {
 			this.dBody.addEvent("mousedown", function(ev) {
 				this.focus();
+				try { document.activeElement = this; } catch(e) {}
 			}).setProperty("tabIndex", -1);
-//		}
+
+			// Keyboard shortcuts
+			var keyBindings = {
+				"ctrl a": this.selectAll.bind(this),
+				"ctrl e": this.unselectAll.bind(this),
+				"ctrl f": this.showFilterBar.bind(this)
+			};
+
+			if (Browser.Platform.mac) {
+				ctrlToMeta(keyBindings);
+			}
+
+			this.dCont.addStopEvent("keydown", function(ev) {
+				var key = eventToKey(ev);
+				if (keyBindings[key]) {
+					keyBindings[key](ev);
+				}
+				else {
+					return true;
+				}
+			});
+
+			this.dCont.addEvent("keydown", (function(ev) {
+				this.fireEvent("onKeyDown", ev);
+			}).bind(this));
+		}
 	},
 
 	"setAlignment": function() {
@@ -763,34 +841,9 @@ var STable = new Class({
 
 		this.sIndex = ind;
 		if (!simpleReverse) {
-			var $me = this, comp;
-			switch (this.colHeader[ind].type) {
-				case TYPE_STRING:
-					comp = this.sortAlphaNumeric.bind(this);
-				break;
+			var colType = this.colHeader[ind].type;
+			var comp = (TYPE_CUSTOM === colType ? this.sortCustomWrap(ind) : comp = this.cmp[colType]) || this.cmp.DEFAULT;
 
-				case TYPE_NUMBER:
-				case TYPE_NUM_PROGRESS:
-					comp = this.sortNumeric.bind(this);
-				break;
-
-				case TYPE_NUM_ORDER:
-					comp = this.sortNumOrder.bind(this);
-				break;
-
-				case TYPE_CUSTOM:
-					if ($me.sortCustom) {
-						comp = function(x, y) {
-							return $me.sortCustom(ind, $me.rowData[x.key].data, $me.rowData[y.key].data);
-						}
-						break;
-					}
-
-				default:
-					comp = function(x, y) {
-						return Comparator.compare(x.v, y.v);
-					};
-			}
 			this.rowCache.sort(comp);
 		}
 
@@ -810,7 +863,7 @@ var STable = new Class({
 			i += diff;
 		}
 		if (this.options.mode == MODE_PAGE)
-			this.pageCount = Math.ceil(this.activeId.length / this.options.maxRows);
+			this.pageCount = MATH_CEIL([this.activeId.visCount, this.activeId.length].pick() / this.options.maxRows);
 
 		this.isSorting = false;
 
@@ -820,7 +873,15 @@ var STable = new Class({
 		this.fireEvent("onSort", [this.sIndex, this.options.reverse]);
 	},
 
-	//"cmp": {}, // map for compare functions, type -> function
+	"cmp": {}, // map for compare functions, type -> function
+
+	"sortCustomWrap": function(idx) {
+		if (this.sortCustom) {
+			return (function(x, y) {
+				this.sortCustom(idx, this.rowData[x.key].data, this.rowData[y.key].data);
+			}).bind(this);
+		}
+	},
 
 	"sortNumeric": function(x, y) {
 		var r = Comparator.compareNumeric(x.v, y.v);
@@ -890,53 +951,79 @@ var STable = new Class({
 	"getActiveRange": function() {
 		var max = this.options.maxRows, mni = 0, mxi = 0;
 		if (this.options.mode == MODE_VIRTUAL) {
-			mni = (this.activeId.length > 0 ? (Math.floor(this.tBody.offsetTop / this.tb.rowheight) || 0) : 0).min(this.activeId.length - max).max(0);
+			mni = (this.activeId.length > 0 ? (MATH_FLOOR(this.tBody.offsetTop / this.tb.rowheight) || 0) : 0).min(this.activeId.length - max).max(0);
 		} else {
 			mni = max * this.curPage;
 		}
-		mxi = (mni + max - 1).min(this.activeId.length - 1);
-		return [mni.max(0), mxi.max(0)];
+		mxi = (mni + max - 1).min(this.activeId.length - 1).max(0);
+		mni = mni.max(0);
+
+		// Extend range if rows in "default" range are filtered out
+		var actId = this.activeId, rData = this.rowData;
+		var visCount = 0;
+
+		for (var i = mni; i <= mxi; ++i) {
+			var row = rData[actId[i]];
+			if (row && !(row.hidden || row.filtOut)) {
+				++visCount;
+			}
+		}
+		for (var hi = this.activeId.length; visCount < max && mxi < hi; ++mxi) {
+			var row = rData[actId[mxi]];
+			if (row && !(row.hidden || row.filtOut)) {
+				++visCount;
+			}
+		}
+
+		return (this.activeRange = [mni, mxi, visCount]);
 	},
 
 	"refreshRows": function() {
 		if (this.__refreshRows_refreshing__) return;
 		this.__refreshRows_refreshing__ = true;
 
-		var range = this.getActiveRange(), count = 0, tbc = this.tb.body.childNodes, altRows = this.options.alternateRows;
+		var range = this.getActiveRange(), count = filtCount = 0, tbc = this.tb.body.childNodes, altRows = this.options.alternateRows;
+		var actId = this.activeId, rData = this.rowData;
 		for (var i = range[0], il = range[1]; i <= il; i++) {
-			var id = this.activeId[i], rdata = this.rowData[id], row = tbc[count];
-			if (!(rdata && row)) continue;
+			var id = actId[i], row = rData[id], ele = tbc[count-filtCount];
+			if (!(row && ele)) continue;
+
+			row.rowIndex = count++ - filtCount;
+
+			if (row.filtOut) {
+				++filtCount;
+				continue;
+			}
 
 			var clsName = "", clsChanged = false;
 			if (has(this.rowSel, id))
 				clsName += "selected";
-			clsChanged = (clsName.test("selected") != row.hasClass("selected"));
+			clsChanged = (clsName.test("selected") != ele.hasClass("selected"));
 			if (altRows) {
-				if (i & 1) {
+				if ((i - filtCount) & 1) {
 					clsName += " odd";
-					clsChanged = clsChanged || !row.hasClass("odd");
+					clsChanged = clsChanged || !ele.hasClass("odd");
 				} else {
 					clsName += " even";
-					clsChanged = clsChanged || !row.hasClass("even");
+					clsChanged = clsChanged || !ele.hasClass("even");
 				}
 			}
 			else {
-				clsChanged = clsChanged || row.hasClass("odd") || row.hasClass("even");
+				clsChanged = clsChanged || ele.hasClass("odd") || ele.hasClass("even");
 			}
 			if (clsChanged)
-				row.className = clsName.clean();
+				ele.className = clsName.clean();
 
-			var data = this.options.format(Array.clone(rdata.data));
-			this.fillRow(row, data);
-			row.setProperties({
+			var data = this.options.format(Array.clone(row.data));
+			this.fillRow(ele, data);
+			ele.setProperties({
 				"title": data[0],
 				"id": this.id + "-row-" + id
 			}).show(true);
-			rdata.rowIndex = count++;
-			this.setIcon(id, rdata.icon);
+			this.setIcon(id, row.icon);
 		}
 
-		for (var i = count, il = tbc.length; i < il; i++)
+		for (var i = count - filtCount, il = tbc.length; i < il; i++)
 			tbc[i].setProperty("id", "").hide();
 
 		if (Browser.ie && Browser.version <= 7) {
@@ -947,7 +1034,6 @@ var STable = new Class({
 
 		this.refresh();
 		this.requiresRefresh = false;
-		this.refreshPageInfo();
 
 		this.__refreshRows_refreshing__ = false;
 	},
@@ -961,7 +1047,7 @@ var STable = new Class({
 	},
 
 	"selectRow": function(ev, row) {
-		var id = row.id.replace(new RegExp("^" + this.id + "-row-", ""), "");
+		var id = row.id.replace(this.idprefix, "");
 		if (!(ev.isRightClick() && has(this.rowSel, id))) {
 			var multi = !!this.options.rowMultiSelect;
 			var ctrl = ((Browser.Platform.mac && ev.meta) || (!Browser.Platform.mac && ev.control));
@@ -1031,119 +1117,142 @@ var STable = new Class({
 	},
 
 	"_insertRow": function(id, skipOrderCheck) {
-		skipOrderCheck = (skipOrderCheck === true);
-		var sindex = this.sIndex;
-		if (this.isValidCol(sindex)) {
-			var $me = this, index = 0;
+		var actId = this.activeId;
+		var sIndex = this.sIndex;
+		var reverse = this.options.reverse;
+
+		var rCache = this.rowCache;
+		var rData = this.rowData;
+		var row = rData[id];
+		var index;
+
+		if (this.isValidCol(sIndex)) {
 			if (!skipOrderCheck) {
-				var comp, from = 0, to = this.rowCache.length, rIndex = this.rowData[id].index, item = {
-					"key": id,
-					"v": this.rowData[id].data[sindex]
-				};
-				switch (this.colHeader[sindex].type) {
-					case TYPE_STRING:
-						comp = this.sortAlphaNumeric.bind(this);
-					break;
+				var item = { "key": id, "v": row.data[sIndex] };
+				var min = 0, max = rCache.length, rIndex = row.index;
 
-					case TYPE_NUMBER:
-					case TYPE_NUM_PROGRESS:
-						comp = this.sortNumeric.bind(this);
-					break;
+				var colType = this.colHeader[sIndex].type;
+				var comp = (TYPE_CUSTOM === colType ? this.sortCustomWrap(sIndex) : comp = this.cmp[colType]) || this.cmp.DEFAULT;
 
-					case TYPE_NUM_ORDER:
-						comp = this.sortNumOrder.bind(this);
-					break;
-
-					case TYPE_CUSTOM:
-						if ($me.sortCustom) {
-							comp = function(x, y) {
-								return $me.sortCustom(sindex, $me.rowData[x.key].data, $me.rowData[y.key].data);
-							}
-							break;
-						}
-
-					default:
-						comp = function(x, y) {
-							return Comparator.compare(x.v, y.v);
-						};
-				}
 				if (rIndex >= 0) {
-					if ((rIndex != 0) && (comp(item, this.rowCache[rIndex - 1]) < 0)) {
-						to = rIndex + 1;
-					} else if ((rIndex < this.rowCache.length - 1) && (comp(item, this.rowCache[rIndex + 1]) > 0)) {
-						from = rIndex;
+					if ((rIndex != 0) && (comp(item, rCache[rIndex - 1]) < 0)) {
+						max = rIndex + 1;
+					}
+					else if ((rIndex < rCache.length - 1) && (comp(item, rCache[rIndex + 1]) > 0)) {
+						min = rIndex;
 					}
 				}
-				index = this.rowCache.binarySearch(item, comp, from, to);
-				if (index < 0)
+
+				index = rCache.binarySearch(item, comp, min, max);
+
+				if (index < 0) {
 					index = -(index + 1);
-				if (index != rIndex) {
-					if (rIndex >= 0) {
-						if (rIndex < index)
-							index--;
-						this.rowCache.splice(rIndex, 1);
-					}
-					this.rowCache.splice(index, 0, item);
-					if (rIndex == -1) {
-						for (var i = index, j = this.rowCache.length; i < j; i++)
-							this.rowData[this.rowCache[i].key].index = i;
-					} else {
-						var min = (index < rIndex) ? index : rIndex, max = (min == index) ? rIndex : index;
-						for (var i = min; i <= max; i++)
-							this.rowData[this.rowCache[i].key].index = i;
-					}
-				} else {
-					this.rowCache[index].v = item.v;
+				}
+
+				if (index == rIndex) {
+					rCache[index].v = item.v;
 					item = item.key = item.v = null;
 				}
-			}
-			if (this.rowData[id].activeIndex != -1) {
-				index = this.rowData[id].activeIndex;
-				this.rowData[id].rowIndex = this.rowData[id].activeIndex = -1;
-				this.activeId.splice(index, 1);
-				for (var i = 0, j = this.activeId.length; i < j; i++)
-					this.rowData[this.activeId[i]].activeIndex = i;
-				if (this.rowData[id].hidden)
-					this.requiresRefresh = true;
-			}
-			if (!this.rowData[id].hidden) {
-				index = this.activeId.binarySearch(id, function(idA, idB) {
-					return ($me.rowData[idA].index - $me.rowData[idB].index) * (($me.options.reverse) ? -1 : 1);
-				});
-				if (index < 0)
-					index = -(index + 1);
-				this.activeId.splice(index, 0, id);
-				for (var i = index, j = this.activeId.length; i < j; i++)
-					this.rowData[this.activeId[i]].activeIndex = i;
-				var range = this.getActiveRange();
-				if ((index >= range[0]) && (index <= range[1])) {
-					this.requiresRefresh = true;
-					this.rowData[id].rowIndex = index - range[0];
+				else {
+					if (rIndex >= 0) {
+						if (rIndex < index) {
+							index--;
+						}
+
+						rCache.splice(rIndex, 1);
+					}
+
+					rCache.splice(index, 0, item);
+
+					if (rIndex == -1) {
+						for (var i = index, j = rCache.length; i < j; i++) {
+							rData[rCache[i].key].index = i;
+						}
+					}
+					else {
+						var lo = rIndex, hi = index;
+						if (index < rIndex) {
+							lo = index; hi = rIndex;
+						}
+
+						for (var i = lo; i < max; i++) {
+							rData[rCache[i].key].index = i;
+						}
+					}
 				}
 			}
-		} else {
-			if (!this.rowData[id].hidden && (this.rowData[id].activeIndex == -1)) {
-				index = this.rowData[id].activeIndex = this.activeId.length;
-				this.activeId.push(id);
-				var range = this.getActiveRange();
-				if ((index >= range[0]) && (index <= range[1]))
+			if (row.activeIndex != -1) {
+				actId.splice(row.activeIndex, 1);
+				row.rowIndex = row.activeIndex = -1;
+
+				for (var i = 0, j = actId.length; i < j; i++) {
+					rData[actId[i]].activeIndex = i;
+				}
+
+				if (row.hidden) {
 					this.requiresRefresh = true;
-			} else if (this.rowData[id].hidden && (this.rowData[id].activeIndex != -1)) {
-				var index = this.rowData[id].activeIndex;
-				this.rowData[id].activeIndex = -1;
-				this.activeId.splice(index, 1);
-				for (var i = index, j = this.activeId.length; i < j; i++)
-					this.rowData[this.activeId[i]].activeIndex = i;
-				this.requiresRefresh = true;
+				}
+			}
+			if (!row.hidden) {
+				index = actId.binarySearch(id, (reverse
+					? function(idA, idB) { return rData[idB].index - rData[idA].index; }
+					: function(idA, idB) { return rData[idA].index - rData[idB].index; }
+				));
+
+				if (index < 0) {
+					index = -(index + 1);
+				}
+
+				actId.splice(index, 0, id);
+				for (var i = index, j = actId.length; i < j; i++) {
+					rData[actId[i]].activeIndex = i;
+				}
+
+				var range = (this.activeRange || this.getActiveRange());
+				if ((range[0] <= index) && (index <= range[1])) {
+					row.rowIndex = (index - range[0]);
+					this.requiresRefresh = true;
+				}
 			}
 		}
-		if (this.options.mode == MODE_PAGE)
-			this.pageCount = Math.ceil(this.activeId.length / this.options.maxRows);
+		else {
+			if (row.hidden) {
+				index = row.activeIndex;
+
+				if (index != -1) {
+					row.activeIndex = -1;
+					actId.splice(index, 1);
+
+					for (var i = index, j = actId.length; i < j; i++) {
+						rData[actId[i]].activeIndex = i;
+					}
+
+					this.requiresRefresh = true;
+				}
+			}
+			else {
+				if (row.activeIndex == -1) {
+					index = row.activeIndex = actId.length;
+					actId.push(id);
+
+					var range = (this.activeRange || this.getActiveRange());
+					if ((range[0] <= index) && (index <= range[1])) {
+						this.requiresRefresh = true;
+					}
+				}
+			}
+		}
+
+		if (this.options.mode == MODE_PAGE) {
+			this.pageCount = MATH_CEIL(actId.length / this.options.maxRows);
+		}
 	},
 
 	"clearActive": function() {
-		for (var i = 0, j = this.activeId.length; i < j; i++)
-			this.rowData[this.activeId[i]].activeIndex = -1;
+		var actId = this.activeId, rData = this.rowData
+		for (var i = 0, j = this.activeId.length; i < j; i++) {
+			rData[actId[i]].activeIndex = -1;
+		}
 		this.activeId.empty();
 	},
 
@@ -1155,14 +1264,7 @@ var STable = new Class({
 		this.colOrder.each(function(v, k) {
 			switch (colh[k].type) {
 				case TYPE_NUM_PROGRESS:
-					var pcnt = (parseFloat(data[k]) || 0), pcntp = pcnt.toFixedNR(1) + "%";
-					rowc[v].set("html", "").grab(
-						simpleClone(DIV, false).addClass("stable-progress").set("text", pcntp).grab(
-							simpleClone(DIV, false).addClass("stable-progress-bar").setStyle("width", pcntp).grab(
-								simpleClone(DIV, false).set("text", pcntp).setStyle("width", (pcnt ? (100 * 100/pcnt).toFixedNR(1) + "%" : 0))
-							)
-						)
-					);
+					rowc[v].set("html", "").grab(progressBar(parseFloat(data[k]) || 0));
 				break;
 
 				default:
@@ -1205,7 +1307,7 @@ var STable = new Class({
 			for (var i = index, j = this.activeId.length; i < j; i++)
 				this.rowData[this.activeId[i]].activeIndex = i;
 			if (this.options.mode == MODE_PAGE) {
-				this.pageCount = Math.ceil(this.activeId.length / this.options.maxRows);
+				this.pageCount = MATH_CEIL([this.activeId.visCount, this.activeId.length].pick() / this.options.maxRows);
 				if (this.curPage > this.pageCount)
 					this.curPage--;
 			}
@@ -1232,33 +1334,32 @@ var STable = new Class({
 	},
 
 	"clearRows": function(keepMeta) {
-		if (this.rows > 0) {
-			this.stSel = null;
-			this.clearCache();
+		if (this.rows <= 0) return;
 
-			Array.each(this.tb.body.rows, function(row) {
-				Array.each(row.cells, function(cell) {
-					cell.set("html", "");
-				});
-				row.setProperty("id", "").hide();
+		this.stSel = null;
+		this.clearCache();
+
+		Array.each(this.tb.body.rows, function(row) {
+			Array.each(row.cells, function(cell) {
+				cell.set("html", "");
 			});
-			delete this.rowData;
-			this.rowData = {};
-			this.rows = this.curPage = this.pageCount = 0;
-			this.activeId.empty();
+			row.setProperty("id", "").hide();
+		});
+		delete this.rowData;
+		this.rowData = {};
+		this.rows = this.curPage = this.pageCount = 0;
+		this.activeId.empty();
 
-			if (!keepMeta) {
-				this.resetScroll();
-				this.resizePads();
+		if (!keepMeta) {
+			this.resetScroll();
+			this.resizePads();
 
-				delete this.rowSel;
-				this.rowSel = {};
-				this.selectedRows.empty();
-			}
-
-			this.updatePageMenu();
-			this.refreshPageInfo();
+			delete this.rowSel;
+			this.rowSel = {};
+			this.selectedRows.empty();
 		}
+
+		this.updatePageMenu();
 	},
 
 	"calcRowHeight": function() {
@@ -1274,16 +1375,38 @@ var STable = new Class({
 	},
 
 	"calcSize": function() {
-		var showIB = (this.options.refreshable || this.options.mode == MODE_PAGE);
+		var showPC = (this.options.mode == MODE_PAGE);
+		if (showPC) {
+			this.pageChanger.show();
+		}
+		else {
+			this.pageChanger.hide();
+		}
+
+		var showFBC = !(showPC || this.options.refreshable);
+		var showIB = (!showFBC || this.filterShow);
 		if (showIB) {
 			this.infoBar.show();
+
+			if (showFBC) {
+				(this.filterBar
+					.setStyle("paddingLeft", "20px")
+					.getElement("a.filterbar-close").show()
+				);
+			}
+			else {
+				(this.filterBar
+					.setStyle("paddingLeft")
+					.getElement("a.filterbar-close").hide()
+				);
+			}
 		}
 		else {
 			this.infoBar.hide();
 		}
 
 		this.dBody.setStyles({
-			"height": (this.dCont.clientHeight - this.dHead.offsetHeight - (showIB ? this.infoBar.offsetHeight : 0)).max(52),
+			"height": (this.dCont.clientHeight - this.dHead.offsetHeight - (showIB ? this.infoBar.offsetHeight : 0)),
 			"width": (this.dCont.offsetWidth - 2).max(0)
 		});
 
@@ -1317,15 +1440,9 @@ var STable = new Class({
 		this._insertRow(id, true);
 	},
 
-	"refreshPageInfo": function() {
-		if (this.pageInfo && this.options.rowMultiSelect) {
-			this.pageInfo.set("text", this.selectedRows.length + " row(s) selected.");
-		}
-	},
-
 	"refreshSelection": function() {
 		if (!this.options.rowsSelectable) return;
-		var idprefix = new RegExp("^" + this.id + "-row-", "");
+		var idprefix = this.idprefix;
 		var tbc = this.tb.body.childNodes;
 		for (var i = 0, il = tbc.length; i < il; ++i) {
 			if (has(this.rowSel, tbc[i].id.replace(idprefix, ""))) {
@@ -1335,7 +1452,6 @@ var STable = new Class({
 				tbc[i].removeClass("selected");
 			}
 		}
-		this.refreshPageInfo();
 	},
 
 	"clearSelection": function(noRefresh) {
@@ -1349,8 +1465,16 @@ var STable = new Class({
 	},
 
 	"fillSelection": function(noRefresh) {
-		this.selectedRows = Array.clone(this.activeId);
-		for (var i = 0, j = this.selectedRows.length; i < j; i++)
+		var actId = this.activeId, rData = this.rowData;
+
+		this.selectedRows = [];
+		for (var i = 0, j = actId.length; i < j; ++i) {
+			var row = rData[actId[i]];
+			if (row && !(row.hidden || row.filtOut)) {
+				this.selectedRows.push(actId[i]);
+			}
+		}
+		for (var i = 0, j = this.selectedRows.length; i < j; ++i)
 			this.rowSel[this.selectedRows[i]] = i;
 		if (!noRefresh)
 			this.refreshSelection();
@@ -1385,6 +1509,92 @@ var STable = new Class({
 		}, this);
 	},
 
+	"matchFilter": function(id) {
+		var row = this.rowData[id];
+		if (!row) return false;
+
+		if (!this.filterQuery) return true;
+
+		// TODO-FILTER: Generalize to arbitrary columns
+		return (String(row.data[0]).toLowerCase().indexOf(this.filterQuery) >= 0);
+	},
+
+	"applyFilter": function(query) {
+		if (typeof(query) === 'undefined') {
+			query = this.filterQuery;
+		}
+
+		if (!query) {
+			this.resetFilter();
+		}
+		else {
+			this.filterQuery = query.toLowerCase();
+
+			var visCount = 0;
+			var rData = this.rowData;
+			for (var id in rData) {
+				var row = rData[id];
+				if (row && !row.hidden) {
+					row.filtOut = !this.matchFilter(id);
+					if (!row.filtOut) ++visCount;
+				}
+			}
+			this.activeId.visCount = visCount;
+
+			this.refreshRows();
+			this.resizePads();
+		}
+	},
+
+	"resetFilter": function() {
+		this.filterQuery = null;
+
+		var rData = this.rowData;
+		for (var id in rData) {
+			var row = rData[id];
+			if (row && !row.hidden) row.filtOut = false;
+		}
+		this.activeId.visCount = this.activeId.length;
+
+		this.refreshRows();
+	},
+
+	"hideFilterBar": function() {
+		this.filterShow = false;
+		this.calcSize();
+
+		this.filterBarQueryInput.blur();
+		this.filterBarQueryInput.set("value", "");
+
+		this.dBody.focus();
+		try { document.activeElement = this.dBody; } catch(e) {}
+
+		this.resetFilter();
+	},
+
+	"showFilterBar": function() {
+		this.filterShow = true;
+		this.calcSize();
+
+		this.filterBarQueryInput.focus();
+		this.filterBarQueryInput.select();
+
+		try { document.activeElement = this.filterBarQueryInput; } catch(e) {}
+	},
+
+	"selectAll": function(ev) {
+		if (this.options.rowMultiSelect) {
+			this.clearSelection();
+			this.fillSelection();
+			this.fireEvent("onSelect", ev);
+		}
+	},
+
+	"unselectAll": function(ev) {
+		this.clearSelection();
+		this.fireEvent("onSelect", ev);
+	},
+
 	"updateCell": function(id, col, data) {
 		var row = this.rowData[id];
 		if (row == null) return;
@@ -1396,27 +1606,22 @@ var STable = new Class({
 			this._insertRow(id);
 		if (this.requiresRefresh || row.hidden || (row.rowIndex == -1) || !$(this.id + "-row-" + id)) return hasSortedChanged;
 		var r = this.tb.body.childNodes[row.rowIndex], cell = r.childNodes[this.colOrder[col]], fval = this.options.format(Array.clone(data), col);
-		if (this.colHeader[col].type == TYPE_NUM_PROGRESS) {
-			var pcnt = (parseFloat(fval) || 0), pcntp = pcnt.toFixedNR(1) + "%";
-			cell.set("html", "").grab(
-				simpleClone(DIV, false).addClass("stable-progress").set("text", pcntp).grab(
-					simpleClone(DIV, false).addClass("stable-progress-bar").setStyle("width", pcntp).grab(
-						simpleClone(DIV, false).set("text", pcntp).setStyle("width", (pcnt ? (100 * 100/pcnt).toFixedNR(1) + "%" : 0))
-					)
-				)
-			);
-		}
-		else {
-			if (this.colHeader[col].icon) {
-				cell.set("html", "").grab(
-					simpleClone(DIV, false).grab(
-						simpleClone(SPAN, false).set("class", "icon")
-					).appendText(fval)
-				);
-			}
-			else {
-				cell.set("text", fval);
-			}
+		switch (this.colHeader[col].type) {
+			case TYPE_NUM_PROGRESS:
+				cell.set("html", "").grab(progressBar(parseFloat(fval) || 0));
+			break;
+
+			default:
+				if (this.colHeader[col].icon) {
+					cell.set("html", "").grab(
+						simpleClone(DIV, false).grab(
+							simpleClone(SPAN, false).set("class", "icon")
+						).appendText(fval)
+					);
+				}
+				else {
+					cell.set("text", fval);
+				}
 		}
 		return hasSortedChanged;
 	},
@@ -1439,6 +1644,7 @@ var STable = new Class({
 				}
 			}
 		}
+
 		if (col === undefined || this.colHeader[col].disabled) {
 			col = this.colOrder[0];
 		}
@@ -1470,7 +1676,7 @@ var STable = new Class({
 		this.colHeader.each(function(col, idx) {
 			var opts = [col.text, this.toggleColumn.bind(this, idx)];
 			if (!col.disabled)
-				opts.splice(0, 0, CMENU_CHECK);
+				opts.unshift(CMENU_CHECK);
 			ContextMenu.add(opts);
 		}, this);
 		if (this.resetText) {
@@ -1503,7 +1709,7 @@ var STable = new Class({
 
 			case MODE_VIRTUAL:
 				var rHeight = this.tb.rowheight;
-				var pHeight = this.activeId.length * rHeight;
+				var pHeight = [this.activeId.visCount, this.activeId.length].pick() * rHeight;
 				var tHeight = (this.options.maxRows * rHeight).min(pHeight);
 
 				var top = this.dBody.scrollTop;
@@ -1532,7 +1738,7 @@ var STable = new Class({
 		}
 
 		if (resized || this.requiresRefresh) {
-			this.refreshRows();
+			this.applyFilter();
 		}
 
 		return resized;
@@ -1618,7 +1824,7 @@ var STable = new Class({
 			this.pageCount = 0;
 		}
 		else {
-			this.pageCount = Math.ceil(this.activeId.length / this.options.maxRows);
+			this.pageCount = MATH_CEIL([this.activeId.visCount, this.activeId.length].pick() / this.options.maxRows);
 		}
 
 		if (this.curPage > 0)
@@ -1651,7 +1857,7 @@ var STable = new Class({
 		var range = this.getActiveRange();
 		for (var j = range[0]; j <= range[1]; j++)
 			this.rowData[this.activeId[j]].rowIndex = -1;
-		this.updatePageMenu();
+//		this.updatePageMenu(); // handled in this.refreshRows() call to this.refresh()
 		this.refreshRows();
 	},
 

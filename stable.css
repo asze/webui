@@ -190,9 +190,26 @@ limitations under the License.
 	right: 0;
 }
 
-.stable-infobar .pageInfo {
-	padding: 4px;
+.stable-infobar .filterbar {
+	padding: 3px 5px;
 	float: left;
+}
+
+.stable-infobar .filterbar-close {
+	background: transparent url(./images/close.png) no-repeat 0px 0px;
+	clip: rect(0 14px 14px 0);
+	left: 3px;
+	margin: -7px 0;
+	padding: 7px;
+	position: absolute;
+	top: 50%;
+}
+
+	.stable-infobar a.filterbar-close:hover { background-position: -14px; }
+	.stable-infobar a.filterbar-close:active { background-position: -28px; }
+
+.stable-infobar .filterbar-query {
+	margin-left: 5px;
 }
 
 .stable-infobar .refreshBtn {
@@ -208,7 +225,7 @@ limitations under the License.
 }
 
 .stable-infobar .pageChanger {
-	padding: 4px;
+	padding: 3px;
 	float: right;
 }
 
