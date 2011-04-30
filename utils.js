@@ -375,4 +375,4 @@ Object.append(Element.NativeEvents, {
 	dragstart: 2, drag: 2, dragover: 2, dragenter: 2, dragleave: 2, drop: 2, dragend: 2 // drag-and-drop
 });
 
-})()
+})();

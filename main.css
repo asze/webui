@@ -229,6 +229,17 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	margin-top: 8px;
 }
 
+#msg .error {
+	background-color: #FFEEEE;
+	border: 1px solid #FFBBBB;
+	color: #FF4444;
+	height: 150px;
+	margin-top: 8px;
+	padding: 3px;
+	text-align: left;
+	width: 75%;
+}
+
 #msg ul {
 	list-style-position: inside;
 }

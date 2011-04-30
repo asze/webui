@@ -323,24 +323,15 @@ var utWebUI = {
 		// Load settings
 		this.getSettings((function() {
 			this.update.delay(0, this, (function() {
-				this.refreshSelectedTorGroups();
-				this.hideMsg();
+				try {
+					this.refreshSelectedTorGroups();
+					hideMsg();
+				}
+				catch (e) {
+					showErr(e);
+				}
 			}).bind(this));
 		}).bind(this));
-	},
-
-	"showMsg": function(html) {
-		if (typeOf(html) === 'element') {
-			$("msg").clear().grab(html);
-		}
-		else {
-			$("msg").set("html", html);
-		}
-		$("cover").show();
-	},
-
-	"hideMsg": function() {
-		$("cover").hide();
 	},
 
 	"beginPeriodicUpdate": function(delay) {
@@ -410,7 +401,7 @@ var utWebUI = {
 						}
 						else {
 							window.removeEvents("unload");
-							self.showMsg(
+							showMsg(
 								'<p>WebUI is having trouble connecting to &micro;Torrent.</p>' +
 								'<p>Try <a href="#" onclick="window.location.reload(true);">reloading</a> the page.</p>'
 							);
@@ -2683,7 +2674,7 @@ var utWebUI = {
 			this.request("action=setsetting" + str, Function.from(), !reload); // if the page is going to reload make it a synchronous request
 
 		if (this.settings["webui.enable"] == 0) {
-			this.showMsg('WebUI was disabled. Goodbye.');
+			showMsg('WebUI was disabled. Goodbye.');
 			return;
 		}
 
@@ -2692,12 +2683,12 @@ var utWebUI = {
 
 		if (port != new_port) {
 			this.endPeriodicUpdate();
-			this.showMsg(
+			showMsg(
 				'<p>&micro;Torrent has been configured to use a listening port for WebUI different from the port on which it is currently being viewed.</p>' +
 				'<p>How do you wish to proceed?</p>' +
 				'<ul>' +
 					'<li><a href="' + changePort(new_port) + '">Reload</a> on the new port</li>' +
-					'<li><a href="#" onclick="utWebUI.beginPeriodicUpdate(); utWebUI.hideMsg(); return false;">Ignore</a> the port change</li>' +
+					'<li><a href="#" onclick="utWebUI.beginPeriodicUpdate(); hideMsg(); return false;">Ignore</a> the port change</li>' +
 				'</ul>'
 			);
 		}
@@ -4327,7 +4318,7 @@ var utWebUI = {
 
 	"restoreUI": function(bc) {
 		if ((bc != false) && !confirm("Are you sure that you want to restore the interface?")) return;
-		this.showMsg('Reloading WebUI...');
+		showMsg('Reloading WebUI...');
 		window.removeEvents("unload");
 		this.config = {};
 		this.saveConfig(false, function(){ window.location.reload(false); });

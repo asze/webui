@@ -41,18 +41,54 @@ var g_feedItemQlty = [
 var ELE_TD = new Element("td");
 var ELE_TR = new Element("tr");
 
+//================================================================================
+// MESSAGE
+//================================================================================
+
+function hideMsg() {
+	$("cover").hide();
+}
+
+function showMsg(html) {
+	if (typeOf(html) === 'element') {
+		$("msg").clear().grab(html);
+	}
+	else {
+		$("msg").set("html", html);
+	}
+	$("cover").show();
+}
+
+function showErr(err) {
+	var errArr = [];
+	for (var p in err) {
+		errArr.push(p + ': ' + err[p]);
+	}
+
+	showMsg(
+		'<p>An error occurred while running WebUI.</p>' +
+		'<textarea readonly="readonly" class="error">' + errArr.join('\n') + '</textarea>' +
+		'<p>Try <a href="#" onclick="window.location.reload(true);">reloading</a> the page.</p>'
+	);
+}
+
 
 //================================================================================
 // MAIN
 //================================================================================
 
 window.addEvent("domready", function() {
-	$(document.body);
+	try {
+		$(document.body);
 
-	setupGlobalEvents();
-	setupUserInterface();
+		setupGlobalEvents();
+		setupUserInterface();
 
-	utWebUI.init();
+		utWebUI.init();
+	}
+	catch (e) {
+		showErr(e);
+	}
 });
 
 
