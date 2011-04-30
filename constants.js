@@ -6,7 +6,7 @@ found in the LICENSE file.
 */
 
 var CONST = {
-	VERSION: "0.380"
+	VERSION: "0.381"
 	, BUILD: ""
 
 	//----------------------------------------
