@@ -174,6 +174,7 @@ var DialogManager = {
 		try {
 			if (dlgWin.contains(document.activeElement)) {
 				document.activeElement.blur();
+				document.activeElement = null;
 			}
 		} catch(e) {}
 
@@ -226,9 +227,11 @@ var DialogManager = {
 
 		try {
 			var actEl = document.activeElement;
-			if (actEl && !dlg.contains(actEl)) {
-				actEl.blur();
-				document.activeElement = null;
+			if (actEl !== document.body) {
+				if (actEl && !dlg.contains(actEl)) {
+					actEl.blur();
+					document.activeElement = null;
+				}
 			}
 		} catch(e) {}
 	},
