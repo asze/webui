@@ -202,17 +202,7 @@ function setupGlobalEvents() {
 		};
 
 		if (Browser.Platform.mac) {
-			keyBindings["meta a"] = keyBindings["ctrl a"];
-			keyBindings["meta e"] = keyBindings["ctrl e"];
-			keyBindings["meta o"] = keyBindings["ctrl o"];
-			keyBindings["meta p"] = keyBindings["ctrl p"];
-			keyBindings["meta u"] = keyBindings["ctrl u"];
-
-			delete keyBindings["ctrl a"];
-			delete keyBindings["ctrl e"];
-			delete keyBindings["ctrl o"];
-			delete keyBindings["ctrl p"];
-			delete keyBindings["ctrl u"];
+			ctrlToMeta(keyBindings);
 		}
 
 		document.addStopEvent("keydown", function(ev) {

@@ -23,6 +23,20 @@ function eventToKey(ev) {
 	);
 }
 
+function ctrlToMeta(bindings) {
+	for (var key in bindings) {
+		var split = key.split(" ");
+		if (split.length === 2 && split[0] === "ctrl") {
+			split[0] = "meta";
+
+			bindings[split.join(" ")] = bindings[key];
+			delete bindings[key];
+		}
+	}
+
+	return bindings;
+}
+
 function has(obj, key) {
 	return Object.prototype.hasOwnProperty.apply(obj, [key]);
 }
@@ -72,10 +86,16 @@ function encodeID(str) {
 	return escape(str.replace(/[A-Za-z0-9\*\@\-\_\+\.\/]/g, function(c) { return "_" + c.charCodeAt(0).toString(16); })).replace(/%/g, '_');
 }
 
+(function () {
+
+var MATH_CEIL = Math.ceil;
+var MATH_FLOOR = Math.floor;
+var MATH_ROUND = Math.round;
+
 Array.implement({
 
 	// http://www.leepoint.net/notes-java/algorithms/searching/binarysearch.html
-	"binarySearch": function(value, comparator, first, upto) {
+	"binarySearch": function(value, comparator, min, max) {
 		if (typeof(comparator) != 'function') {
 			comparator = function(a, b) {
 				if (a === b) return 0;
@@ -83,20 +103,20 @@ Array.implement({
 				return 1;
 			};
 		}
-		first = first || 0;
-		upto = upto || this.length;
-		while (first < upto) {
-			var mid = ((first + upto) / 2).toInt();
+		min = min || 0;
+		max = max || this.length;
+		while (min < max) {
+			var mid = parseInt((min + max) / 2, 10);
 			var cv = comparator(value, this[mid]);
 			if (cv < 0) {
-				upto = mid;
+				max = mid;
 			} else if (cv > 0) {
-				first = mid + 1;
+				min = mid + 1;
 			} else {
 				return mid;
 			}
 		}
-		return -(first + 1);
+		return -(min + 1);
 	},
 
 	"insertAt": function(value, index) {
@@ -139,7 +159,7 @@ String.implement({
 		type = type || "right";
 		len -= inp.length;
 		if (len < 0) return inp;
-		str = (new Array(Math.ceil(len / str.length) + 1)).join(str).substr(0, len);
+		str = (new Array(MATH_CEIL(len / str.length) + 1)).join(str).substr(0, len);
 		return ((type == "left") ? (str + inp) : (inp + str));
 	}
 
@@ -184,15 +204,15 @@ Number.implement({
 		var secs = Number(this);
 		if (secs > 63072000) return "\u221E"; // secs > 2 years ~= inf. :)
 		var div, y, w, d, h, m, s, output = "";
-		y = Math.floor(secs / 31536000);
+		y = MATH_FLOOR(secs / 31536000);
 		div = secs % 31536000;
-		w = Math.floor(div / 604800);
+		w = MATH_FLOOR(div / 604800);
 		div = div % 604800;
-		d = Math.floor(div / 86400);
+		d = MATH_FLOOR(div / 86400);
 		div = div % 86400;
-		h = Math.floor(div / 3600);
+		h = MATH_FLOOR(div / 3600);
 		div = div % 3600;
-		m = Math.floor(div / 60);
+		m = MATH_FLOOR(div / 60);
 		s = div % 60;
 		if (y > 0) {
 			output = _("TIME_YEARS_WEEKS").replace(/%d/, y).replace(/%d/, w);
@@ -243,7 +263,7 @@ Date.implement({
 					case 'L': return d.getMilliseconds().pad(3);
 					case 'm': return (d.getMonth() + 1).pad(2);
 					case 'M': return d.getMinutes().pad(2);
-					case 's': return Math.round(d / 1000);
+					case 's': return MATH_ROUND(d / 1000);
 					case 'S': return d.getSeconds().pad(2);
 					case 'w': return d.getDay();
 					case 'y': return d.getFullYear().toString().substr(2);
@@ -354,3 +374,5 @@ Event.implement({
 Object.append(Element.NativeEvents, {
 	dragstart: 2, drag: 2, dragover: 2, dragenter: 2, dragleave: 2, drop: 2, dragend: 2 // drag-and-drop
 });
+
+})()

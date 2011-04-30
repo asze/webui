@@ -276,11 +276,11 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	z-index: 50;
 }
 
-.folder-tabs li > span {
+.folder-tabs li > a > span {
 	opacity: 0.60;
 }
 
-.folder-tabs .selected > span {
+.folder-tabs .selected > a > span {
 	opacity: 1.00;
 }
 

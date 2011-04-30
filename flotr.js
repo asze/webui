@@ -1261,10 +1261,10 @@ var Flotr = (function(){
 
 					var div = $(lgndId);
 					if (!div) {
-						div = new Element('div').set("id", lgndId).addClass('flotr-legend').setStyles(Object.append(pos, {
+						div = new Element('div.flotr-legend#' + lgndId, {"styles": Object.append(pos, {
 							'position': 'absolute',
 							'z-index': 2
-						}));
+						})});
 
 						target.adopt(div);
 					}
@@ -1298,7 +1298,7 @@ var Flotr = (function(){
 
 						var bgdiv = $(lgndId + "-bg");
 						if (!bgdiv) {
-							bgdiv = new Element('div').set("id", lgndId + "-bg").addClass('flotr-legend-bg').inject(div, 'before');
+							bgdiv = new Element('div.flotr-legend-bg#' + lgndId + '-bg').inject(div, 'before');
 						}
 
 						bgdiv.setStyles(Object.append(pos,{

@@ -479,7 +479,7 @@ function _(id, index) {
 	if (typeof(index) === 'number' && index >= 1) {
 		str = str.split("||");
 
-		if (index > str.length) {
+		if (index >= str.length) {
 			index = str.length - 1;
 		}
 

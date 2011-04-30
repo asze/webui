@@ -171,9 +171,11 @@ var DialogManager = {
 		var dlgWin = $("dlg" + id);
 
 		dlgWin.hide();
-		if (dlgWin.contains(document.activeElement)) {
-			document.activeElement.blur();
-		}
+		try {
+			if (dlgWin.contains(document.activeElement)) {
+				document.activeElement.blur();
+			}
+		} catch(e) {}
 
 		this.showing = this.showing.erase(id);
 
@@ -219,7 +221,16 @@ var DialogManager = {
 			$("dlg" + this.showing.getLast()).removeClass("dlg-top");
 
 		this.showing.push(id);
-		$("dlg" + id).addClass("dlg-top").setStyle("zIndex", ++this.winZ);
+		var dlg = $("dlg" + id);
+		dlg.addClass("dlg-top").setStyle("zIndex", ++this.winZ);
+
+		try {
+			var actEl = document.activeElement;
+			if (actEl && !dlg.contains(actEl)) {
+				actEl.blur();
+				document.activeElement = null;
+			}
+		} catch(e) {}
 	},
 
 	"getTopModal": function() {
