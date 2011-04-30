@@ -115,74 +115,69 @@ var utWebUI = {
 	"rssfdTable": new STable(),
 	"advOptTable": new STable(),
 	"trtColDefs": [
-		//[ colID, colWidth, colType, colDisabled = false, colIcon = false, colAlign = ALIGN_AUTO, colText = "" ]
-		  ["name", 220, TYPE_STRING]
-		, ["order", 35, TYPE_NUM_ORDER]
-		, ["size", 75, TYPE_NUMBER]
-		, ["remaining", 90, TYPE_NUMBER, true]
-		, ["done", 60, TYPE_NUM_PROGRESS]
-		, ["status", 100, TYPE_CUSTOM]
-		, ["seeds", 60, TYPE_NUMBER]
-		, ["peers", 60, TYPE_NUMBER]
-		, ["seeds_peers", 80, TYPE_NUMBER, true]
-		, ["downspeed", 80, TYPE_NUMBER]
-		, ["upspeed", 80, TYPE_NUMBER]
-		, ["eta", 60, TYPE_NUM_ORDER]
-		, ["uploaded", 75, TYPE_NUMBER, true]
-		, ["downloaded", 75, TYPE_NUMBER, true]
-		, ["ratio", 50, TYPE_NUMBER]
-		, ["availability", 50, TYPE_NUMBER]
-		, ["label", 80, TYPE_STRING, true]
-		, ["added", 150, TYPE_NUMBER, true, false, ALIGN_LEFT]
-		, ["completed", 150, TYPE_NUMBER, true, false, ALIGN_LEFT]
-		, ["url", 250, TYPE_STRING, true]
+		  { "id": "name"         , "width": 220 , "type": TYPE_STRING       }
+		, { "id": "order"        , "width": 35  , "type": TYPE_NUM_ORDER    }
+		, { "id": "size"         , "width": 75  , "type": TYPE_NUMBER       }
+		, { "id": "remaining"    , "width": 90  , "type": TYPE_NUMBER       , "hidden" : true }
+		, { "id": "done"         , "width": 60  , "type": TYPE_NUM_PROGRESS }
+		, { "id": "status"       , "width": 100 , "type": TYPE_CUSTOM       }
+		, { "id": "seeds"        , "width": 60  , "type": TYPE_NUMBER       }
+		, { "id": "peers"        , "width": 60  , "type": TYPE_NUMBER       }
+		, { "id": "seeds_peers"  , "width": 80  , "type": TYPE_NUMBER       , "hidden" : true }
+		, { "id": "downspeed"    , "width": 80  , "type": TYPE_NUMBER       }
+		, { "id": "upspeed"      , "width": 80  , "type": TYPE_NUMBER       }
+		, { "id": "eta"          , "width": 60  , "type": TYPE_NUM_ORDER    }
+		, { "id": "uploaded"     , "width": 75  , "type": TYPE_NUMBER       , "hidden" : true }
+		, { "id": "downloaded"   , "width": 75  , "type": TYPE_NUMBER       , "hidden" : true }
+		, { "id": "ratio"        , "width": 50  , "type": TYPE_NUMBER       }
+		, { "id": "availability" , "width": 50  , "type": TYPE_NUMBER       }
+		, { "id": "label"        , "width": 80  , "type": TYPE_STRING       , "hidden" : true }
+		, { "id": "added"        , "width": 150 , "type": TYPE_NUMBER       , "hidden" : true , "align": ALIGN_LEFT }
+		, { "id": "completed"    , "width": 150 , "type": TYPE_NUMBER       , "hidden" : true , "align": ALIGN_LEFT }
+		, { "id": "url"          , "width": 250 , "type": TYPE_STRING       , "hidden" : true }
 	],
 	"prsColDefs": [
-		//[ colID, colWidth, colType, colDisabled = false, colIcon = false, colAlign = ALIGN_AUTO, colText = "" ]
-		  ["ip", 200, TYPE_STRING] // TODO: See if this should use TYPE_CUSTOM
-		, ["port", 60, TYPE_NUMBER, true]
-		, ["client", 125, TYPE_STRING]
-		, ["flags", 60, TYPE_STRING]
-		, ["pcnt", 80, TYPE_NUM_PROGRESS]
-		, ["relevance", 70, TYPE_NUMBER, true]
-		, ["downspeed", 80, TYPE_NUMBER]
-		, ["upspeed", 80, TYPE_NUMBER]
-		, ["reqs", 40, TYPE_STRING]
-		, ["waited", 60, TYPE_NUMBER, true]
-		, ["uploaded", 70, TYPE_NUMBER]
-		, ["downloaded", 70, TYPE_NUMBER]
-		, ["hasherr", 70, TYPE_NUMBER, true]
-		, ["peerdl", 70, TYPE_NUMBER]
-		, ["maxup", 70, TYPE_NUMBER, true]
-		, ["maxdown", 70, TYPE_NUMBER, true]
-		, ["queued", 70, TYPE_NUMBER, true]
-		, ["inactive", 60, TYPE_NUMBER, true]
+		  { "id": "ip"         , "width": 200 , "type": TYPE_STRING       } // TODO: See if this should use "type": TYPE_CUSTOM
+		, { "id": "port"       , "width": 60  , "type": TYPE_NUMBER       , "hidden": true }
+		, { "id": "client"     , "width": 125 , "type": TYPE_STRING       }
+		, { "id": "flags"      , "width": 60  , "type": TYPE_STRING       }
+		, { "id": "pcnt"       , "width": 80  , "type": TYPE_NUM_PROGRESS }
+		, { "id": "relevance"  , "width": 70  , "type": TYPE_NUMBER       , "hidden": true }
+		, { "id": "downspeed"  , "width": 80  , "type": TYPE_NUMBER       }
+		, { "id": "upspeed"    , "width": 80  , "type": TYPE_NUMBER       }
+		, { "id": "reqs"       , "width": 40  , "type": TYPE_STRING       }
+		, { "id": "waited"     , "width": 60  , "type": TYPE_NUMBER       , "hidden": true }
+		, { "id": "uploaded"   , "width": 70  , "type": TYPE_NUMBER       }
+		, { "id": "downloaded" , "width": 70  , "type": TYPE_NUMBER       }
+		, { "id": "hasherr"    , "width": 70  , "type": TYPE_NUMBER       , "hidden": true }
+		, { "id": "peerdl"     , "width": 70  , "type": TYPE_NUMBER       }
+		, { "id": "maxup"      , "width": 70  , "type": TYPE_NUMBER       , "hidden": true }
+		, { "id": "maxdown"    , "width": 70  , "type": TYPE_NUMBER       , "hidden": true }
+		, { "id": "queued"     , "width": 70  , "type": TYPE_NUMBER       , "hidden": true }
+		, { "id": "inactive"   , "width": 60  , "type": TYPE_NUMBER       , "hidden": true }
 	],
 	"flsColDefs": [
-		//[ colID, colWidth, colType, colDisabled = false, colIcon = false, colAlign = ALIGN_AUTO, colText = "" ]
-		  ["name", 300, TYPE_STRING]
-		, ["size", 75, TYPE_NUMBER]
-		, ["done", 75, TYPE_NUMBER]
-		, ["pcnt", 60, TYPE_NUM_PROGRESS]
-		, ["firstpc", 70, TYPE_NUMBER, true]
-		, ["numpcs", 70, TYPE_NUMBER, true]
-		, ["prio", 65, TYPE_NUMBER, false, false, ALIGN_LEFT]
+		  { "id": "name"    , "width": 300 , "type": TYPE_STRING       }
+		, { "id": "size"    , "width": 75  , "type": TYPE_NUMBER       }
+		, { "id": "done"    , "width": 75  , "type": TYPE_NUMBER       }
+		, { "id": "pcnt"    , "width": 60  , "type": TYPE_NUM_PROGRESS }
+		, { "id": "firstpc" , "width": 70  , "type": TYPE_NUMBER       , "hidden": true }
+		, { "id": "numpcs"  , "width": 70  , "type": TYPE_NUMBER       , "hidden": true }
+		, { "id": "prio"    , "width": 65  , "type": TYPE_NUMBER       , "align": ALIGN_LEFT }
 	],
 	"fdColDefs": [
-		//[ colID, colWidth, colType, colDisabled = false, colIcon = false, colAlign = ALIGN_AUTO, colText = "" ]
-		  ["fullname", 355, TYPE_STRING, false, true]
-		, ["name", 215, TYPE_STRING, true, true]
-		, ["episode", 70, TYPE_NUMBER, true]
-		, ["format", 70, TYPE_NUMBER, true, false, ALIGN_LEFT]
-		, ["codec", 70, TYPE_NUMBER, true, false, ALIGN_LEFT]
-		, ["date", 150, TYPE_NUMBER, false, false, ALIGN_LEFT]
-		, ["feed", 130, TYPE_STRING, true]
-		, ["url", 250, TYPE_STRING, true]
+		  { "id": "fullname" , "width": 355 , "type": TYPE_STRING , "icon": true }
+		, { "id": "name"     , "width": 215 , "type": TYPE_STRING , "hidden": true, "icon": true }
+		, { "id": "episode"  , "width": 70  , "type": TYPE_NUMBER , "hidden": true }
+		, { "id": "format"   , "width": 70  , "type": TYPE_NUMBER , "hidden": true, "align": ALIGN_LEFT }
+		, { "id": "codec"    , "width": 70  , "type": TYPE_NUMBER , "hidden": true, "align": ALIGN_LEFT }
+		, { "id": "date"     , "width": 150 , "type": TYPE_NUMBER , "align": ALIGN_LEFT }
+		, { "id": "feed"     , "width": 130 , "type": TYPE_STRING , "hidden": true }
+		, { "id": "url"      , "width": 250 , "type": TYPE_STRING , "hidden": true }
 	],
 	"advOptColDefs": [
-		//[ colID, colWidth, colType, colDisabled = false, colIcon = false, colAlign = ALIGN_AUTO, colText = "" ]
-		  ["name", 240, TYPE_STRING]
-		, ["value", 235, TYPE_STRING]
+		  { "id": "name"  , "width": 240, "type": TYPE_STRING }
+		, { "id": "value" , "width": 235, "type": TYPE_STRING }
 	],
 	"trtColDoneIdx": -1, // automatically calculated based on this.trtColDefs
 	"trtColStatusIdx": -1, // automatically calculated based on this.trtColDefs
@@ -315,15 +310,15 @@ var utWebUI = {
 		this.config.lang = "";
 
 		// Calculate index of some columns for ease of reference elsewhere
-		this.trtColDoneIdx = this.trtColDefs.map(function(item) { return (item[0] == "done"); }).indexOf(true);
-		this.trtColStatusIdx = this.trtColDefs.map(function(item) { return (item[0] == "status"); }).indexOf(true);
-		this.flsColPrioIdx = this.flsColDefs.map(function(item) { return (item[0] == "prio"); }).indexOf(true);
+		this.trtColDoneIdx = this.trtColDefs.map(function(col) { return (col.id == "done"); }).indexOf(true);
+		this.trtColStatusIdx = this.trtColDefs.map(function(col) { return (col.id == "status"); }).indexOf(true);
+		this.flsColPrioIdx = this.flsColDefs.map(function(col) { return (col.id == "prio"); }).indexOf(true);
 
 		// Set default colMask values based on colDefs
-		this.trtColDefs.each(function(item, index) { this.trtColToggle(index, item[3], true); }, this);
-		this.prsColDefs.each(function(item, index) { this.prsColToggle(index, item[3], true); }, this);
-		this.flsColDefs.each(function(item, index) { this.flsColToggle(index, item[3], true); }, this);
-		this.fdColDefs.each(function(item, index) { this.fdColToggle(index, item[3], true); }, this);
+		this.trtColDefs.each(function(col, idx) { this.trtColToggle(idx, col.hidden, true); }, this);
+		this.prsColDefs.each(function(col, idx) { this.prsColToggle(idx, col.hidden, true); }, this);
+		this.flsColDefs.each(function(col, idx) { this.flsColToggle(idx, col.hidden, true); }, this);
+		this.fdColDefs.each(function(col, idx) { this.fdColToggle(idx, col.hidden, true); }, this);
 
 		// Load settings
 		this.getSettings((function() {
@@ -1016,7 +1011,7 @@ var utWebUI = {
 							if (v != rdata.data[k]) {
 								ret = this.trtTable.updateCell(hash, k, row) || ret;
 
-								if ("done" == this.trtColDefs[k][0]) {
+								if ("done" == this.trtColDefs[k].id) {
 									// Update the "Status" column if "Done" column changed (in case "Checking" percentage needs updating)
 									ret = this.trtTable.updateCell(hash, this.trtColStatusIdx, row) || ret;
 								}
@@ -3022,8 +3017,8 @@ var utWebUI = {
 	},
 
 	"trtDataToRow": function(data) {
-		return this.trtColDefs.map(function(item) {
-			switch (item[0]) {
+		return this.trtColDefs.map(function(col) {
+			switch (col.id) {
 				case "added":
 					return data[CONST.TORRENT_DATE_ADDED] * 1000;
 
@@ -3098,7 +3093,7 @@ var utWebUI = {
 		}
 
 		for (var i = (index || 0); i < len; i++) {
-			switch (this.trtColDefs[i][0]) {
+			switch (this.trtColDefs[i].id) {
 				case "label":
 				case "name":
 				case "peers":
@@ -3172,7 +3167,7 @@ var utWebUI = {
 	"trtSortCustom": function(col, dataX, dataY) {
 		var ret = 0;
 
-		switch (this.trtColDefs[col][0]) {
+		switch (this.trtColDefs[col].id) {
 			case "status":
 				var statX = dataX[col][0], statY = dataY[col][0];
 				ret = ((statY & CONST.STATE_ERROR) - (statX & CONST.STATE_ERROR)); // errored sorts before unerrored
@@ -3707,8 +3702,8 @@ var utWebUI = {
 	},
 
 	"flsDataToRow": function(data) {
-		return this.flsColDefs.map(function(item) {
-			switch (item[0]) {
+		return this.flsColDefs.map(function(col) {
+			switch (col.id) {
 				case "done":
 					return data[CONST.FILE_DOWNLOADED];
 
@@ -3738,7 +3733,7 @@ var utWebUI = {
 		var len = (useidx ? (index + 1) : values.length);
 
 		for (var i = (index || 0); i < len; i++) {
-			switch (this.flsColDefs[i][0]) {
+			switch (this.flsColDefs[i].id) {
 				case "name":
 				break;
 
@@ -3909,11 +3904,11 @@ var utWebUI = {
 	"trtColReset": function() {
 		var config = {
 			  "colMask": 0
-			, "colOrder": this.trtColDefs.map(function(item, idx) { return idx; })
-			, "colWidth": this.trtColDefs.map(function(item, idx) { return item[1]; })
+			, "colOrder": this.trtColDefs.map(function(col, idx) { return idx; })
+			, "colWidth": this.trtColDefs.map(function(col, idx) { return col.width; })
 		};
 
-		this.trtColDefs.each(function(item, idx) { if (!!item[3]) config.colMask |= (1 << idx); });
+		this.trtColDefs.each(function(col, idx) { if (!!col.hidden) config.colMask |= (1 << idx); });
 
 		this.trtTable.setConfig(config);
 		Object.append(this.config.torrentTable, config);
@@ -3981,11 +3976,11 @@ var utWebUI = {
 	"prsColReset": function() {
 		var config = {
 			  "colMask": 0
-			, "colOrder": this.prsColDefs.map(function(item, idx) { return idx; })
-			, "colWidth": this.prsColDefs.map(function(item, idx) { return item[1]; })
+			, "colOrder": this.prsColDefs.map(function(col, idx) { return idx; })
+			, "colWidth": this.prsColDefs.map(function(col, idx) { return col.width; })
 		};
 
-		this.prsColDefs.each(function(item, idx) { if (!!item[3]) config.colMask |= (1 << idx); });
+		this.prsColDefs.each(function(col, idx) { if (!!col.hidden) config.colMask |= (1 << idx); });
 
 		this.prsTable.setConfig(config);
 		Object.append(this.config.peerTable, config);
@@ -4011,8 +4006,8 @@ var utWebUI = {
 	},
 
 	"prsDataToRow": function(data) {
-		return this.prsColDefs.map(function(item) {
-			switch (item[0]) {
+		return this.prsColDefs.map(function(col) {
+			switch (col.id) {
 				case "ip":
 					return (
 						  ((this.settings["resolve_peerips"] && data[CONST.PEER_REVDNS]) || data[CONST.PEER_IP])
@@ -4078,7 +4073,7 @@ var utWebUI = {
 		var len = (useidx ? (index + 1) : values.length);
 
 		for (var i = (index || 0); i < len; i++) {
-			switch (this.prsColDefs[i][0]) {
+			switch (this.prsColDefs[i].id) {
 				case "ip":
 				case "port":
 				case "client":
@@ -4173,11 +4168,11 @@ var utWebUI = {
 	"flsColReset": function() {
 		var config = {
 			  "colMask": 0
-			, "colOrder": this.flsColDefs.map(function(item, idx) { return idx; })
-			, "colWidth": this.flsColDefs.map(function(item, idx) { return item[1]; })
+			, "colOrder": this.flsColDefs.map(function(col, idx) { return idx; })
+			, "colWidth": this.flsColDefs.map(function(col, idx) { return col.width; })
 		};
 
-		this.flsColDefs.each(function(item, idx) { if (!!item[3]) config.colMask |= (1 << idx); });
+		this.flsColDefs.each(function(col, idx) { if (!!col.hidden) config.colMask |= (1 << idx); });
 
 		this.flsTable.setConfig(config);
 		Object.append(this.config.fileTable, config);
@@ -4225,8 +4220,8 @@ var utWebUI = {
 	},
 
 	"advOptDataToRow": function(data) {
-		return this.advOptColDefs.map(function(item) {
-			switch (item[0]) {
+		return this.advOptColDefs.map(function(col) {
+			switch (col.id) {
 				case "name":
 					return data[0];
 
@@ -4242,7 +4237,7 @@ var utWebUI = {
 
 /*
 		for (var i = (index || 0); i < len; i++) {
-			switch (this.advOptColDefs[i][0]) {
+			switch (this.advOptColDefs[i].id) {
 				case "name":
 				case "value":
 					break;
@@ -4259,11 +4254,11 @@ var utWebUI = {
 	"advOptColReset": function() {
 		var config = {
 			  "colMask": 0
-			, "colOrder": this.advOptColDefs.map(function(item, idx) { return idx; })
-			, "colWidth": this.advOptColDefs.map(function(item, idx) { return item[1]; })
+			, "colOrder": this.advOptColDefs.map(function(col, idx) { return idx; })
+			, "colWidth": this.advOptColDefs.map(function(col, idx) { return col.width; })
 		};
 
-		this.advOptColDefs.each(function(item, idx) { if (!!item[3]) config.colMask |= (1 << idx); });
+		this.advOptColDefs.each(function(col, idx) { if (!!col.hidden) config.colMask |= (1 << idx); });
 
 		this.advOptTable.setConfig(config);
 	},
@@ -4603,9 +4598,9 @@ var utWebUI = {
 
 	"tableUseProgressBar": function(enable) {
 		var progFunc = Function.from(enable ? TYPE_NUM_PROGRESS : TYPE_NUMBER);
-		var trtProgCols = this.trtColDefs.filter(function(item) { return item[2] == TYPE_NUM_PROGRESS; }).map(function(item) { return item[0]; });
-		var prsProgCols = this.prsColDefs.filter(function(item) { return item[2] == TYPE_NUM_PROGRESS; }).map(function(item) { return item[0]; });
-		var flsProgCols = this.flsColDefs.filter(function(item) { return item[2] == TYPE_NUM_PROGRESS; }).map(function(item) { return item[0]; });
+		var trtProgCols = this.trtColDefs.filter(function(col) { return col.type == TYPE_NUM_PROGRESS; }).map(function(col) { return col.id; });
+		var prsProgCols = this.prsColDefs.filter(function(col) { return col.type == TYPE_NUM_PROGRESS; }).map(function(col) { return col.id; });
+		var flsProgCols = this.flsColDefs.filter(function(col) { return col.type == TYPE_NUM_PROGRESS; }).map(function(col) { return col.id; });
 		this.trtTable.setConfig({"colType": trtProgCols.map(progFunc).associate(trtProgCols)});
 		this.prsTable.setConfig({"colType": trtProgCols.map(progFunc).associate(prsProgCols)});
 		this.flsTable.setConfig({"colType": flsProgCols.map(progFunc).associate(flsProgCols)});
@@ -4687,7 +4682,7 @@ var utWebUI = {
 		var len = (useidx ? (index + 1) : values.length);
 
 		for (var i = (index || 0); i < len; i++) {
-			switch (this.fdColDefs[i][0]) {
+			switch (this.fdColDefs[i].id) {
 				case "fullname":
 				case "name":
 				case "url":
@@ -4736,8 +4731,8 @@ var utWebUI = {
 	},
 
 	"fdDataToRow": function(data) {
-		return this.fdColDefs.map(function(item) {
-			switch (item[0]) {
+		return this.fdColDefs.map(function(col) {
+			switch (col.id) {
 				case "fullname":
 					return data[CONST.RSSITEM_NAME_FULL];
 
@@ -4772,11 +4767,11 @@ var utWebUI = {
 	"fdColReset": function() {
 		var config = {
 			  "colMask": 0
-			, "colOrder": this.fdColDefs.map(function(item, idx) { return idx; })
-			, "colWidth": this.fdColDefs.map(function(item, idx) { return item[1]; })
+			, "colOrder": this.fdColDefs.map(function(col, idx) { return idx; })
+			, "colWidth": this.fdColDefs.map(function(col, idx) { return col.width; })
 		};
 
-		this.fdColDefs.each(function(item, idx) { if (!!item[3]) config.colMask |= (1 << idx); });
+		this.fdColDefs.each(function(col, idx) { if (!!col.hidden) config.colMask |= (1 << idx); });
 
 		this.rssfdTable.setConfig(config);
 		Object.append(this.config.feedTable, config);

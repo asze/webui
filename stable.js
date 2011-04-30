@@ -129,20 +129,33 @@ var STable = new Class({
 	"create": function(id, columns, options) {
 		this.cols = columns.length;
 
-		var hasicon = false;
-		this.colHeader = columns.map(function(item) {
-			if (!!item[4]) hasicon = true;
+		var strIdx = -1;
+		this.colIcon = [];
+		this.colFilter = [];
+		this.colHeader = columns.map(function(col, idx) {
+			if (strIdx < 0 && col.type === TYPE_STRING) strIdx = idx;
+			if (!!col.icon) this.colIcon.push(idx);
+			if (!!col.filter) this.colFilter.push(idx);
 			return {
-				  "id": item[0]
-				, "width": item[1]
-				, "type": item[2]
-				, "disabled": !![item[3], !item[1]].pick()
-				, "icon": !!item[4]
-				, "align": item[5] || ALIGN_AUTO
-				, "text": item[6] || item[0] || ""
+				  "id": (col.id || "")
+				, "align": [col.align, ALIGN_AUTO].pick()
+				, "filter": (col.filter && col.type === TYPE_STRING)
+				, "hidden": !![col.hidden, !col.width].pick()
+				, "icon": !!col.icon
+				, "text": (col.text || col.id || "")
+				, "type": [col.type, TYPE_STRING].pick()
+				, "width": (col.width || 0)
 			};
-		});
-		if (!hasicon) this.colHeader[0].icon = true;
+
+		}, this);
+		if (!this.colIcon.length) {
+			this.colHeader[0].icon = true;
+			this.colIcon.push(0);
+		}
+		if (!this.colFilter.length && strIdx >= 0) {
+			this.colHeader[strIdx].filter = true;
+			this.colFilter.push(strIdx);
+		}
 
 		this.colOrder = (options.colOrder && (options.colOrder.length == this.cols)) ? options.colOrder : columns.map(function(item, i) { return i; });
 		this.sIndex = isNaN(options.sIndex) ? -1 : options.sIndex.toInt().limit(-1, this.cols - 1);
@@ -249,13 +262,13 @@ var STable = new Class({
 				.addClass(this.id + "-col-" + this.colOrder[i])
 				.setStyle(
 					badIE ? "visibility" : "display",
-					badIE ? (this.colData[i].disabled ? "hidden" : "visible") : (this.colData[i].disabled ? "none" : "")
+					badIE ? (this.colData[i].hidden ? "hidden" : "visible") : (this.colData[i].hidden ? "none" : "")
 				)
 			);
 
 			td = simpleClone(TD, false)
 				.grab(new Element("div#" + this.id + "-head-" + this.colData[i].id, {"text": this.colData[i].text}))
-				.setStyles({"width": this.colHeader[i].width, "display": this.colData[i].disabled ? "none" : ""})
+				.setStyles({"width": this.colHeader[i].width, "display": this.colData[i].hidden ? "none" : ""})
 				.store("index", i)
 				.inject(tr);
 
@@ -275,7 +288,7 @@ var STable = new Class({
 			this.tBodyCols[i] = new Element("col", {
 				"styles": {
 					"width": this.colHeader[i].width,
-					"display": this.colData[i].disabled ? "none" : ""
+					"display": this.colData[i].hidden ? "none" : ""
 				},
 				"width": this.colHeader[i].width,
 				"span": 1
@@ -494,15 +507,15 @@ var STable = new Class({
 		return ($chk(iCol) && 0 <= iCol && (allowUpEdge ? iCol <= this.cols : iCol < this.cols));
 	},
 
-	"setColumnDisabled": function(iCol, disabled) {
+	"setColumnHidden": function(iCol, hidden) {
 		if (!this.isValidCol(iCol)) return;
 
 		var badIE = (Browser.ie && Browser.version <= 7);
-		this.colData[iCol].disabled = disabled;
-		this.tHeadCols[iCol].setStyle("display", disabled ? "none" : "");
-		this.tBodyCols[iCol].setStyle("display", disabled ? "none" : "");
+		this.colData[iCol].hidden = hidden;
+		this.tHeadCols[iCol].setStyle("display", hidden ? "none" : "");
+		this.tBodyCols[iCol].setStyle("display", hidden ? "none" : "");
 		var sname = badIE ? "visibility" : "display";
-		var svalue = badIE ? (disabled ? "hidden" : "visible") : (disabled ? "none" : "");
+		var svalue = badIE ? (hidden ? "hidden" : "visible") : (hidden ? "none" : "");
 		this.rowModel.childNodes[iCol].setStyle(sname, svalue); // update "model" row in case it's needed again (adding more rows)
 		var tbc = this.tb.body.childNodes;
 		for (var i = 0, il = tbc.length; i < il; i++)
@@ -608,7 +621,7 @@ var STable = new Class({
 		if (typeOf(val) === 'number') {
 			this.outOfDOM((function() {
 				for (var i = 0, bit = 1, len = this.cols; i < len; ++i, bit <<= 1) {
-					this.setColumnDisabled(this.colOrder[i], !!(val & bit));
+					this.setColumnHidden(this.colOrder[i], !!(val & bit));
 				}
 				this.calcSize();
 			}).bind(this));
@@ -968,7 +981,7 @@ var STable = new Class({
 				++visCount;
 			}
 		}
-		for (var hi = this.activeId.length; visCount < max && mxi < hi; ++mxi) {
+		for (var hi = this.activeId.length - 1; visCount < max && mxi < hi; ++mxi) {
 			var row = rData[actId[mxi]];
 			if (row && !(row.hidden || row.filtOut)) {
 				++visCount;
@@ -981,6 +994,8 @@ var STable = new Class({
 	"refreshRows": function() {
 		if (this.__refreshRows_refreshing__) return;
 		this.__refreshRows_refreshing__ = true;
+
+		this.refresh();
 
 		var range = this.getActiveRange(), count = filtCount = 0, tbc = this.tb.body.childNodes, altRows = this.options.alternateRows;
 		var actId = this.activeId, rData = this.rowData;
@@ -1032,7 +1047,6 @@ var STable = new Class({
 			this.outOfDOM(Function.from());
 		}
 
-		this.refresh();
 		this.requiresRefresh = false;
 
 		this.__refreshRows_refreshing__ = false;
@@ -1416,7 +1430,7 @@ var STable = new Class({
 
 		if (!this.isResizing) {
 			for (var i = 0, j = this.cols; i < j; i++) {
-				if (this.colData[i].disabled) continue;
+				if (this.colData[i].hidden) continue;
 
 				var offset = (this.tHeadCols[i].offsetWidth - parseInt(this.tHeadCols[i].style.width, 10)).max(0);
 				this.tHeadCols[i].setStyle("width", (
@@ -1484,7 +1498,7 @@ var STable = new Class({
 		delim = [delim, "\t"].pick();
 
 		var selCols = this.colOrder.map(function(idx) {
-			if (!this.colHeader[idx].disabled) return idx;
+			if (!this.colHeader[idx].hidden) return idx;
 		}, this).clean();
 
 		return (
@@ -1515,8 +1529,13 @@ var STable = new Class({
 
 		if (!this.filterQuery) return true;
 
-		// TODO-FILTER: Generalize to arbitrary columns
-		return (String(row.data[0]).toLowerCase().indexOf(this.filterQuery) >= 0);
+		for (var i = 0, il = this.colFilter.length; i < il; ++i) {
+			if (String(row.data[this.colFilter[i]]).toLowerCase().indexOf(this.filterQuery) >= 0) {
+				return true;
+			}
+		}
+
+		return false;
 	},
 
 	"applyFilter": function(query) {
@@ -1635,17 +1654,17 @@ var STable = new Class({
 		var oldicon = r.retrieve("icon");
 
 		var col;
-		for (var i = 0, il = this.colHeader.length; i < il; ++i) {
-			var curcol = this.colOrder[i];
-			if (this.colHeader[i].icon) {
+		for (var i = 0, il = this.colIcon.length; i < il; ++i) {
+			var curcol = this.colOrder[this.colIcon[i]];
+			if (this.colHeader[this.colIcon[i]].icon) {
 				rc[curcol].removeClass(oldicon).removeClass("stable-icon");
-				if (col === undefined && !this.colHeader[i].disabled) {
+				if (col === undefined && !this.colHeader[i].hidden) {
 					col = curcol;
 				}
 			}
 		}
 
-		if (col === undefined || this.colHeader[col].disabled) {
+		if (col === undefined || this.colHeader[col].hidden) {
 			col = this.colOrder[0];
 		}
 
@@ -1675,7 +1694,7 @@ var STable = new Class({
 		ContextMenu.clear();
 		this.colHeader.each(function(col, idx) {
 			var opts = [col.text, this.toggleColumn.bind(this, idx)];
-			if (!col.disabled)
+			if (!col.hidden)
 				opts.unshift(CMENU_CHECK);
 			ContextMenu.add(opts);
 		}, this);
@@ -1690,8 +1709,8 @@ var STable = new Class({
 	},
 
 	"toggleColumn": function(index) {
-		var hide = !this.colHeader[index].disabled;
-		this.setColumnDisabled(this.colOrder[index], hide);
+		var hide = !this.colHeader[index].hidden;
+		this.setColumnHidden(this.colOrder[index], hide);
 		this.calcSize();
 		this.fireEvent("onColToggle", [index, hide]);
 		this.refreshRows(); // makes sure icons are properly shown
@@ -1827,6 +1846,9 @@ var STable = new Class({
 			this.pageCount = MATH_CEIL([this.activeId.visCount, this.activeId.length].pick() / this.options.maxRows);
 		}
 
+		if (this.curPage >= this.pageCount)
+			this.curPage = this.pageCount - 1;
+
 		if (this.curPage > 0)
 			this.pagePrev.removeClass("disabled");
 		else
@@ -1883,7 +1905,7 @@ var ColumnHandler = {
 		if ((x <= 4) && (i > 0)) { // resizing, mouse slightly to right of resize grip
 			// Skip hidden columns...
 			var j = i - 1;
-			while (j >= 0 && this.colData[j].disabled) --j;
+			while (j >= 0 && this.colData[j].hidden) --j;
 			if (j >= 0) {
 				x += cell.offsetWidth;
 				i = j;
@@ -1943,7 +1965,7 @@ var ColumnHandler = {
 			$(document.body).setStyle("cursor", "e-resize");
 		} else { // reordering
 			var i = 0, x = drag.mouse.now.x;
-			while ((i < st.cols) && (st.colData[i].disabled || ((st.tHeadCols[i].getLeft() + (st.tHeadCols[i].getWidth() / 2)) < x))) ++i;
+			while ((i < st.cols) && (st.colData[i].hidden || ((st.tHeadCols[i].getLeft() + (st.tHeadCols[i].getWidth() / 2)) < x))) ++i;
 
 			if (i >= st.cols) {
 				i = st.cols;
