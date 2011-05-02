@@ -4838,6 +4838,8 @@ var utWebUI = {
 					}
 				}, this);
 			}).bind(this, feedItemIds)]
+			, [CMENU_SEP]
+			, [_("MENU_COPY"), this.fdShowCopy.bind(this)]
 		];
 
 		//--------------------------------------------------
@@ -4847,6 +4849,10 @@ var utWebUI = {
 		ContextMenu.clear();
 		ContextMenu.add.apply(ContextMenu, menuItems);
 		ContextMenu.show(ev.page);
+	},
+
+	"fdShowCopy": function() {
+		this.showCopy(_("MENU_COPY"), this.rssfdTable.copySelection());
 	},
 
 	"getRSSFeedItem": function(feedId, itemId) {

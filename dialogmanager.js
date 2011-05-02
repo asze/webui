@@ -227,11 +227,9 @@ var DialogManager = {
 
 		try {
 			var actEl = document.activeElement;
-			if (actEl !== document.body) {
-				if (actEl && !dlg.contains(actEl)) {
-					actEl.blur();
-					document.activeElement = null;
-				}
+			if (actEl && (actEl !== document.body) && !dlg.contains(actEl)) {
+				actEl.blur();
+				document.activeElement = null;
 			}
 		} catch(e) {}
 	},

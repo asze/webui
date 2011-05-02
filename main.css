@@ -1115,7 +1115,7 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 }
 
 #prop-trackers {
-	height: 4em;
+	height: 5em;
 }
 
 
@@ -1478,7 +1478,7 @@ input[id="gui.dlrate_menu"] {
 }
 
 #search_list {
-	height: 75px;
+	height: 5em;
 }
 
 /* Hide Unknown Settings */
