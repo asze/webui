@@ -62,12 +62,12 @@ function showMsg(html) {
 function showErr(err) {
 	var errArr = [];
 	for (var p in err) {
-		errArr.push(p + ': ' + err[p]);
+		errArr.push(p.toUpperCase() + ' : ' + err[p]);
 	}
 
 	showMsg(
 		'<p>An error occurred while running WebUI.</p>' +
-		'<textarea readonly="readonly" class="error">' + errArr.join('\n') + '</textarea>' +
+		'<textarea readonly="readonly" class="error">' + (new Element("p", { "text": errArr.join('\n') })).get("html") + '</textarea>' +
 		'<p>Try <a href="#" onclick="window.location.reload(true);">reloading</a> the page.</p>'
 	);
 }
