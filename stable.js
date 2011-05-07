@@ -1713,6 +1713,23 @@ var STable = new Class({
 		this.isResizing = false;
 	},
 
+	"scrollTo": function(id) {
+		var actId = this.activeId, rData = this.rowData;
+		var sRow = rData[id];
+
+		if (sRow && !(sRow.hidden || sRow.filtOut)) {
+			var visIdx = 0;
+			for (var i = 0, il = actId.length; i < il && actId[i] != id; ++i) {
+				var row = rData[actId[i]];
+				if (row && !(row.hidden || row.filtOut)) {
+					++visIdx;
+				}
+			}
+
+			this.dBody.scrollTop = (visIdx * this.tb.rowheight);
+		}
+	},
+
 	"colMenu": function(coords) {
 		ContextMenu.clear();
 		this.colHeader.each(function(col, idx) {
