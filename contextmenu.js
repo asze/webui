@@ -15,31 +15,26 @@ var ELE_DIV = new Element("div");
 var ELE_LI = new Element("li");
 var ELE_UL = new Element("ul");
 
+//==============================================================================
+// CONTEXT MENU
+//==============================================================================
+
 var ContextMenu = {
 
+	"element": null,
 	"hideAfterClick": true,
 	"hidden": true,
-
-	"init": function(id) {
-		this.element = ELE_DIV.clone(false)
-			.addClass("CMenu")
-			.setProperties({
-				"class": "CMenu",
-				"id": id
-			})
-			.inject(document.body)
-			.addStopEvent("mousedown")
-			.grab(ELE_UL.clone(false));
-	},
 
 	"add": function() {
 		function clickEvent(fn) {
 			return (function(ev) {
-				if (ContextMenu.hideAfterClick)
+				if (ContextMenu.hideAfterClick) {
 					ContextMenu.hide();
+				}
 
-				if (typeof(fn) == 'function')
+				if (typeof(fn) == 'function') {
 					fn(ev);
+				}
 			});
 		}
 
@@ -51,7 +46,7 @@ var ContextMenu = {
 			items.splice(0, 1);
 		}
 		else {
-			menu = this.element.getElement("ul");
+			menu = this.getElement().getElement("ul");
 		}
 
 		items.each(function(item) {
@@ -90,16 +85,19 @@ var ContextMenu = {
 					);
 
 					var ul = ELE_UL.clone(false);
-					var div = ELE_DIV.clone(false)
+					var div = (ELE_DIV.clone(false)
 						.addClass("CMenu")
-						.grab(ul);
+						.grab(ul)
+					);
 
 					li.adopt(div).addStopEvents({
 						"mouseenter": function(){ ContextMenu.show(this.getCoordinates(), div); },
 						"mouseleave": function(){ ContextMenu.hide(div); }
 					});
-					for (var k = 0, len = item[2].length; k < len; k++)
+
+					for (var k = 0, len = item[2].length; k < len; k++) {
 						this.add(ul, item[2][k]);
+					}
 				break;
 
 				default:
@@ -123,8 +121,34 @@ var ContextMenu = {
 	},
 
 	"clear": function() {
-		this.element.getElement("ul").set("html", "");
-		this.hideAfterClick = true;
+		this.getElement().getElement("ul").set("html", "");
+	},
+
+	"getElement": function() {
+		if (!this.element) {
+			this.element = (ELE_DIV.clone(false)
+				.addClass("CMenu")
+				.inject(document.body)
+				.addStopEvent("mousedown")
+				.grab(ELE_UL.clone(false))
+			);
+		}
+
+		return this.element;
+	},
+
+	"hide": function(ele) {
+		ele = ele || this.getElement();
+		ele.hide();
+
+		// Undo changes possibly made to element in show()
+		ele.getElement("ul").setStyle("top");
+		ele.removeEvents("mousemove");
+
+		if (ele === this.getElement()) {
+			this.hidden = true;
+			this.clear();
+		}
 	},
 
 	"scroll": function(ev) {
@@ -157,7 +181,7 @@ var ContextMenu = {
 	},
 
 	"show": function(rect, ele) {
-		ele = ele || this.element;
+		ele = ele || this.getElement();
 		ele.setStyles({
 			"height": undefined,
 			"width": undefined,
@@ -223,20 +247,6 @@ var ContextMenu = {
 			"left": x.max(0),
 			"top": y.max(0)
 		});
-	},
-
-	"hide": function(ele) {
-		ele = ele || this.element;
-		ele.hide();
-
-		// Undo changes possibly made to element in show()
-		ele.getElement("ul").setStyle("top");
-		ele.removeEvents("mousemove");
-
-		if (ele === this.element) {
-			this.hidden = true;
-			this.clear();
-		}
 	}
 
 };

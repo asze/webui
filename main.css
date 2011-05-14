@@ -183,12 +183,12 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	vertical-align: middle;
 }
 
-#cover, #modalbg {
+#modalbg, #overlay {
 	background: #FFFFFF;
 	height: 100%;
-	left: 0px;
+	left: 0;
 	position: absolute;
-	top: 0px;
+	top: 0;
 	width: 100%;
 }
 
@@ -198,11 +198,11 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	z-index: 500;
 }
 
-#cover {
+#overlay {
 	z-index: 10000;
 }
 
-#msgout {
+#overlay .msgout {
 	display: table;
 	height: 100%;
 	overflow: hidden;
@@ -210,12 +210,12 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	width: 100%;
 }
 
-#msgmid {
+#overlay .msgmid {
 	display: table-cell;
 	vertical-align: middle;
 }
 
-#msg {
+#overlay .msg {
 	background: #FDFDFD;
 	border: 1px solid #D0D0D0;
 	border-width: 1px 0;
@@ -225,11 +225,11 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	text-align: center;
 }
 
-#msg p {
+#overlay .msg p {
 	margin-top: 8px;
 }
 
-#msg .error {
+#overlay .msg .error {
 	background-color: #FFEEEE;
 	border: 1px solid #FFBBBB;
 	color: #FF4444;
@@ -240,7 +240,7 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	width: 75%;
 }
 
-#msg ul {
+#overlay .msg ul {
 	list-style-position: inside;
 }
 

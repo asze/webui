@@ -42,42 +42,6 @@ var ELE_TD = new Element("td");
 var ELE_TR = new Element("tr");
 
 //================================================================================
-// MESSAGE
-//================================================================================
-
-function hideMsg() {
-	$("cover").hide();
-}
-
-function msgVisible() {
-	return ($("cover").getStyle("display") !== "none");
-}
-
-function showMsg(html) {
-	if (typeOf(html) === 'element') {
-		$("msg").clear().grab(html);
-	}
-	else {
-		$("msg").set("html", html);
-	}
-	$("cover").show();
-}
-
-function showErr(err) {
-	var errArr = [];
-	for (var p in err) {
-		errArr.push(p.toUpperCase() + ' : ' + err[p]);
-	}
-
-	showMsg(
-		'<p>An error occurred while running WebUI.</p>' +
-		'<textarea readonly="readonly" class="error">' + (new Element("p", { "text": errArr.join('\n') })).get("html") + '</textarea>' +
-		'<p>Try <a href="#" onclick="window.location.reload(true);">reloading</a> the page.</p>'
-	);
-}
-
-
-//================================================================================
 // MAIN
 //================================================================================
 
@@ -91,7 +55,7 @@ window.addEvent("domready", function() {
 		utWebUI.init();
 	}
 	catch (e) {
-		showErr(e);
+		Overlay.err(e);
 	}
 });
 
@@ -107,7 +71,7 @@ function setupGlobalEvents() {
 	if (__executed_setupGlobalEvents__) return;
 	__executed_setupGlobalEvents__ = true;
 
-	ContextMenu.init("ContextMenu");
+	Overlay.init("overlay");
 
 	//--------------------------------------------------
 	// WINDOW EVENTS

@@ -5,36 +5,24 @@ Use of this source code is governed by a BSD-style that can be
 found in the LICENSE file.
 */
 
-//================================================================================
+//==============================================================================
 // LOGGER
-//================================================================================
+//==============================================================================
 
 var Logger = {
 
 	"element": null,
 	"log_date": false,
 
-	"init": function(element) {
-		this.element = $(element);
+	"init": function(ele) {
+		this.element = document.id(ele);
 	},
 
 	"log": function() {
 		if (!this.element) return;
-		var text = Array.prototype.slice.call(arguments).join(" ");
-		var dt = new Date();
 
-		var YYYY = dt.getFullYear();
-		var MM = dt.getMonth() + 1; MM = (MM < 10 ? "0" + MM : MM);
-		var DD = dt.getDate(); DD = (DD < 10 ? "0" + DD : DD);
-
-		var hh = dt.getHours(); hh = (hh < 10 ? "0" + hh : hh);
-		var mm = dt.getMinutes(); mm = (mm < 10 ? "0" + mm : mm);
-		var ss = dt.getSeconds(); ss = (ss < 10 ? "0" + ss : ss);
-
-		var time = (
-			(this.log_date ? YYYY + "-" + MM + "-" + DD + " " : "") +
-			hh + ":" + mm + ":" + ss
-		);
+		var time = (new Date()).format((this.log_date ? "%Y-%m-%d " : "") + "%H:%M:%S")
+		var text = Array.from(arguments).join(" ");
 
 		this.element.grab(new Element("p")
 			.grab(new Element("span.timestamp", {"text": "[" + time + "] "}))
@@ -52,46 +40,145 @@ var Logger = {
 	"setLogDate": function(log_date) {
 		this.log_date = !!log_date;
 	}
+
 };
 
-function log() {
-	Logger.log.apply(Logger, arguments);
-}
+//==============================================================================
+// OVERLAY
+//==============================================================================
 
-//================================================================================
-// BROWSER CONSOLE
-//================================================================================
+var Overlay = {
 
-window.onerror = function(msg, url, linenumber) {
-	log("JS error: [" + url.split("/").slice(-1)[0] + ":" + linenumber + "] " + msg);
-	//return true;
-};
+	"element": null,
+	"msgBody": null,
 
-window.console = window.console || {};
+	"init": function(ele) {
+		this.element = document.id(ele);
+		this.msgBody = this.element.getElement(".msg");
+	},
 
-console.log = console.log || function(str) {
-	if (window.opera) {
-		opera.postError(str);
-	} else {
-		log(str);
+	"err": function(err) {
+		var errArr = [];
+		switch (typeof(err)) {
+			case 'object':
+				for (var prop in err) {
+					errArr.push(prop.toUpperCase() + ' : ' + err[prop]);
+				}
+			break;
+
+			default:
+				errArr.push(err);
+		}
+
+		this.msg(
+			'<p>An error has occurred.</p>' +
+			'<textarea readonly="readonly" class="error">' + (new Element("p", { "text": errArr.join('\n\n') })).get("html") + '</textarea>' +
+			'<p>Try <a href="#" onclick="window.location.reload(true);">reloading</a> the page.</p>'
+		);
+	},
+
+	"hide": function() {
+		if (!this.element) return;
+		this.element.hide();
+	},
+
+	"msg": function(html) {
+		if (!this.msgBody) return;
+
+		if (typeOf(html) === 'element') {
+			this.msgBody.clear().grab(html);
+		}
+		else {
+			this.msgBody.set("html", html);
+		}
+
+		this.show();
+	},
+
+	"show": function() {
+		if (!this.element) return;
+		this.element.show();
+	},
+
+	"visible": function() {
+		if (!this.element) return false;
+		return (this.element.getStyle("display").trim().toLowerCase() !== "none");
 	}
+
 };
 
-console.assert = console.assert || function() {
-	var args = Array.from(arguments), expr = args.shift();
-	if (!expr) {
-		throw new Error(false);
-	}
-};
+//==============================================================================
+// BROWSER LOGGING
+//==============================================================================
 
-var __console_timers__ = {};
-console.time = console.time || function(name) {
-	if (name == "") return;
-	__console_timers__[name] = Date.now();
-};
+(function(global) {
 
-console.timeEnd = console.timeEnd || function(name) {
-	if (name == "" || !__console_timers__.hasOwnProperty(name)) return;
-	console.log(name + ": " + (Date.now() - __console_timers__[name]) + "ms");
-	delete __console_timers__[name];
-};
+	global.log = function() {
+		Logger.log.apply(Logger, arguments);
+	};
+
+	//--------------------------------------------------------------------------
+	// GLOBAL ERROR HANDLER
+	//--------------------------------------------------------------------------
+
+	global.onerror = function(msg, url, linenumber) {
+		log("JS error: [" + url.split("/").slice(-1)[0] + ":" + linenumber + "] " + msg);
+		//return true;
+	};
+
+	//--------------------------------------------------------------------------
+	// CONSOLE OBJECT
+	//--------------------------------------------------------------------------
+
+	var console = (global.console || {});
+
+	// -- Logging
+
+	console.log = (console.log || global.log);
+	console.info = (console.info || global.log);
+	console.warn = (console.warn || global.log);
+	console.error = (console.error || global.log);
+	console.debug = (console.debug || global.log);
+
+	// -- Assertions
+
+	console.assert = (console.assert || function() {
+		if (!arguments[0]) {
+			throw new Error(arguments[1]);
+		}
+	});
+
+	// -- Timer
+
+	var timers = {};
+	console.time = (console.time || function(name) {
+		if (name) {
+			timers[name] = Date.now();
+		}
+	});
+
+	console.timeEnd = (console.timeEnd || function(name) {
+		if (timers.hasOwnProperty(name)) {
+			console.log(name + ": " + (Date.now() - timers[name]) + "ms");
+			delete timers[name];
+		}
+	});
+
+	// -- Counter
+
+	var counts = {}
+	console.count = (console.count || function(name) {
+		if (name) {
+			if (!counts[name]) {
+				counts[name] = 0;
+			}
+
+			console.log(name + ": " + (++counts[name]));
+		}
+	});
+
+	// -- Export the console object
+
+	global.console = console;
+
+})(this);

@@ -5,6 +5,10 @@ Use of this source code is governed by a BSD-style that can be
 found in the LICENSE file.
 */
 
+//==============================================================================
+// SPEED GRAPH
+//==============================================================================
+
 var SpeedGraph = new Class({
 
 	"element": null,
@@ -95,4 +99,5 @@ var SpeedGraph = new Class({
 
 		this.draw();
 	}
+
 });

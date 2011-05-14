@@ -5,6 +5,10 @@ Use of this source code is governed by a BSD-style that can be
 found in the LICENSE file.
 */
 
+//==============================================================================
+// DIALOG MANAGER
+//==============================================================================
+
 var DialogManager = {
 
 	"winZ": 500,
@@ -161,7 +165,7 @@ var DialogManager = {
 			$("modalbg").hide();
 
 		if (this.isOffScreen(id))
-			$("dlg" + id).centre();
+			$("dlg" + id).center();
 
 		if (this.items[id].onShow)
 			this.items[id].onShow();
@@ -246,4 +250,5 @@ var DialogManager = {
 	"modalIsVisible": function() {
 		return !!this.getTopModal();
 	}
+
 };
