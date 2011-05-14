@@ -383,6 +383,14 @@ var utWebUI = {
 					"url": guiBase + "?token=" + self.TOKEN + "&" + qs + "&t=" + Date.now(),
 					"method": "get",
 					"async": typeof(async) === 'undefined' || !!async,
+					"onError": function(text, error) {
+						try { error.text = JSON.stringify(text); } catch(e){}
+
+						console.log(error);
+						if (msgVisible()) {
+							showErr(error);
+						}
+					},
 					"onFailure": function() {
 						// TODO: Need to be able to distinguish between recoverable and unrecoverable errors...
 						//       Recoverable errors should be retried, unrecoverable errors should not.
@@ -422,7 +430,7 @@ var utWebUI = {
 							}
 						}, async, fails]);
 					},
-					"onSuccess": (fn) ? fn.bind(self) : Function.from()
+					"onSuccess": (fn ? fn.bind(self) : Function.from())
 				}).send();
 			} catch(e){}
 		};

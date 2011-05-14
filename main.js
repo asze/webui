@@ -49,6 +49,10 @@ function hideMsg() {
 	$("cover").hide();
 }
 
+function msgVisible() {
+	return ($("cover").getStyle("display") !== "none");
+}
+
 function showMsg(html) {
 	if (typeOf(html) === 'element') {
 		$("msg").clear().grab(html);
