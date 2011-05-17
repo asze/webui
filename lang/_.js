@@ -469,7 +469,7 @@ var LANG_LIST = {
 	, "zhTW" : "Chinese (Traditional)"
 };
 
-function _(id, index) {
+function L_(id, index) {
 	var str = LANG_STR[LANG_CONST[id]];
 
 	if (typeof(str) === 'undefined') {
