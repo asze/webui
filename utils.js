@@ -167,15 +167,17 @@ function encodeID(str) {
 
 	});
 
+	var SIZE_UNITS, SIZE_UNITS_MAX;
+
 	Number.implement({
 
 		"pad": function(len, str, type) {
-			return ("" + this).pad(len, str || "0", type || "left");
+			return String(this).pad(len, str || "0", type || "left");
 		},
 
 		"toFixedNR": function(numdec) {
 			if (numdec <= 0) {
-				return String.from(parseInt(this, 10));
+				return String(this);
 			}
 			else {
 				var res = this.toFixed(20);
@@ -184,22 +186,27 @@ function encodeID(str) {
 		},
 
 		"toFileSize": function(numdec, unit) {
-			var sz = ["SIZE_B", "SIZE_KB", "SIZE_MB", "SIZE_GB", "SIZE_TB", "SIZE_PB", "SIZE_EB"].map(L_);
-			var szmax = sz.length-1;
+			if (!SIZE_UNITS) {
+				SIZE_UNITS = ["SIZE_B", "SIZE_KB", "SIZE_MB", "SIZE_GB", "SIZE_TB", "SIZE_PB", "SIZE_EB"].map(L_);
+				SIZE_UNITS_MAX = SIZE_UNITS.length - 1;
+			}
+
 			var size = this;
 
 			// Force units to be at least kB
-			unit = parseInt(unit, 10);
+			unit = Number(unit);
+
 			if (isNaN(unit) || unit < 1) {
 				unit = 1;
 				size /= 1024;
 			}
 
-			while ((size >= 1024) && (unit < szmax)) {
+			while ((size >= 1024) && (unit < SIZE_UNITS_MAX)) {
 				size /= 1024;
 				unit++;
 			}
-			return (size.toFixedNR(typeOf(numdec) == 'number' ? numdec : 1) + " " + sz[unit]);
+
+			return (size.toFixedNR(typeof(numdec) === 'number' ? numdec : 1) + " " + SIZE_UNITS[unit]);
 		},
 
 		"toTimeDelta": function() {
