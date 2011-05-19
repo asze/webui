@@ -365,6 +365,10 @@ var STable = new Class({
 						var key = eventToKey(ev).trim();
 
 						switch (key) {
+							case "delete":
+								ev.stopPropagation();
+							break;
+
 							case "esc":
 								this.hideFilterBar();
 								ev.stop();
@@ -373,8 +377,6 @@ var STable = new Class({
 					}).bind(this),
 
 					"keyup": (function(ev) {
-						if (ev.shift || ev.control || ev.alt || ev.meta) return;
-
 						this.applyFilter(ev.target.get("value"));
 					}).bind(this)
 				})
