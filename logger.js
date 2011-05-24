@@ -134,51 +134,61 @@ var Overlay = {
 
 	// -- Logging
 
-	console.log = (console.log || global.log);
-	console.info = (console.info || global.log);
-	console.warn = (console.warn || global.log);
-	console.error = (console.error || global.log);
-	console.debug = (console.debug || global.log);
+	if (!console.log) { console.log = global.log; }
+	if (!console.info) { console.info = global.log; }
+	if (!console.warn) { console.warn = global.log; }
+	if (!console.error) { console.error = global.log; }
+	if (!console.debug) { console.debug = global.log; }
 
 	// -- Assertions
 
-	console.assert = (console.assert || function() {
-		if (!arguments[0]) {
-			throw new Error(arguments[1]);
-		}
-	});
+	if (!console.assert) {
+		console.assert = function() {
+			if (!arguments[0]) {
+				throw new Error(arguments[1]);
+			}
+		};
+	}
 
 	// -- Timer
 
 	var timers = {};
-	console.time = (console.time || function(name) {
-		if (name) {
-			timers[name] = Date.now();
-		}
-	});
 
-	console.timeEnd = (console.timeEnd || function(name) {
-		if (timers.hasOwnProperty(name)) {
-			console.log(name + ": " + (Date.now() - timers[name]) + "ms");
-			delete timers[name];
-		}
-	});
+	if (!console.time) {
+		console.time = function(name) {
+			if (name) {
+				timers[name] = Date.now();
+			}
+		};
+	}
+
+	if (!console.timeEnd) {
+		console.timeEnd = function(name) {
+			if (timers.hasOwnProperty(name)) {
+				console.log(name + ": " + (Date.now() - timers[name]) + "ms");
+				delete timers[name];
+			}
+		};
+	}
 
 	// -- Counter
 
 	var counts = {}
-	console.count = (console.count || function(name) {
-		if (name) {
-			if (!counts[name]) {
-				counts[name] = 0;
-			}
 
-			console.log(name + ": " + (++counts[name]));
-		}
-	});
+	if (!console.count) {
+		console.count = function(name) {
+			if (name) {
+				if (!counts[name]) {
+					counts[name] = 0;
+				}
+
+				console.log(name + ": " + (++counts[name]));
+			}
+		};
+	}
 
 	// -- Export the console object
 
-	global.console = console;
+	if (!global.console) { global.console = console; }
 
 })(this);
