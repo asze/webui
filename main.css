@@ -1416,20 +1416,20 @@ input[id="proxy.password"] { width: 70px; }
 #dlgSettings-Scheduler .mode3:hover { background-color: #DFA8A8; }
 #dlgSettings-Scheduler .disabled .mode3 { background-color: #D0D0D0; }
 
-/* Web UI */
+/* Remote */
 
-#DLG_SETTINGS_9_WEBUI_03,
-#DLG_SETTINGS_9_WEBUI_05 {
+#DLG_SETTINGS_10_REMOTE_04,
+#DLG_SETTINGS_10_REMOTE_05 {
 	float: left;
 }
 
-input[id="webui.username"],
-input[id="webui.password"],
-input[id="webui.guest"] {
+input[id="webui.uconnect_username"],
+input[id="webui.uconnect_password"] {
 	float: right;
 	margin-left: 3px;
 	width: 135px;
 }
+
 
 /* Advanced */
 
@@ -1479,6 +1479,21 @@ input[id="gui.dlrate_menu"] {
 
 #search_list {
 	height: 5em;
+}
+
+/* Web UI */
+
+#DLG_SETTINGS_9_WEBUI_03,
+#DLG_SETTINGS_9_WEBUI_05 {
+	float: left;
+}
+
+input[id="webui.username"],
+input[id="webui.password"],
+input[id="webui.guest"] {
+	float: right;
+	margin-left: 3px;
+	width: 135px;
 }
 
 /* Hide Unknown Settings */

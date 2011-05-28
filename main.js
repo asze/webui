@@ -964,10 +964,11 @@ function setupUserInterface() {
 			, "dlgSettings-TransferCap" : ""
 			, "dlgSettings-Queueing"    : ""
 			, "dlgSettings-Scheduler"   : ""
-			, "dlgSettings-WebUI"       : ""
+			, "dlgSettings-Remote"      : ""
 			, "dlgSettings-Advanced"    : ""
 			, "dlgSettings-UIExtras"    : ""
 			, "dlgSettings-DiskCache"   : ""
+			, "dlgSettings-WebUI"       : ""
 			, "dlgSettings-RunProgram"  : ""
 		},
 		"lazyshow": true,
@@ -1145,6 +1146,10 @@ function setupUserInterface() {
 
 	$("prop-seed_override").addEvent(linkedEvent, function() {
 		_link(this, 0, ["prop-seed_ratio", "prop-seed_time"]);
+	});
+
+	$("webui.uconnect_enable").addEvent(linkedEvent, function() {
+		_link(this, 0, ["webui.uconnect_username", "webui.uconnect_password"]);
 	});
 
 	$("webui.enable").addEvent(linkedEvent, function() {
@@ -1638,11 +1643,12 @@ function loadLangStrings(reload) {
 		, "dlgSettings-BitTorrent"  : L_("ST_CAPT_BITTORRENT")
 		, "dlgSettings-TransferCap" : L_("ST_CAPT_TRANSFER_CAP")
 		, "dlgSettings-Queueing"    : L_("ST_CAPT_QUEUEING")
-		, "dlgSettings-WebUI"       : L_("ST_CAPT_WEBUI")
 		, "dlgSettings-Scheduler"   : L_("ST_CAPT_SCHEDULER")
+		, "dlgSettings-Remote"      : L_("ST_CAPT_REMOTE")
 		, "dlgSettings-Advanced"    : L_("ST_CAPT_ADVANCED")
 		, "dlgSettings-UIExtras"    : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_UI_EXTRAS") // TODO: Use CSS to indent instead of modifying the string directly...
 		, "dlgSettings-DiskCache"   : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_DISK_CACHE") // TODO: Use CSS to indent instead of modifying the string directly...
+		, "dlgSettings-WebUI"       : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_WEBUI") // TODO: Use CSS to indent instead of modifying the string directly...
 		, "dlgSettings-RunProgram"  : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_RUN_PROGRAM") // TODO: Use CSS to indent instead of modifying the string directly...
 	});
 
@@ -1775,20 +1781,11 @@ function loadLangStrings(reload) {
 		, "ST_SCH_LGND_OFF"
 		, "ST_SCH_LGND_SEEDING"
 
-		// Web UI
-		, "DLG_SETTINGS_9_WEBUI_01"
-		, "DLG_SETTINGS_9_WEBUI_02"
-		, "DLG_SETTINGS_9_WEBUI_03"
-		, "DLG_SETTINGS_9_WEBUI_05"
-		, "DLG_SETTINGS_9_WEBUI_07"
-		, "DLG_SETTINGS_9_WEBUI_09"
-		, "DLG_SETTINGS_9_WEBUI_10"
-		, "DLG_SETTINGS_9_WEBUI_12"
-
-		, "MM_OPTIONS_SHOW_CATEGORY"
-		, "MM_OPTIONS_SHOW_DETAIL"
-		, "MM_OPTIONS_SHOW_STATUS"
-		, "MM_OPTIONS_SHOW_TOOLBAR"
+		// Remote
+		, "DLG_SETTINGS_10_REMOTE_02"
+		, "DLG_SETTINGS_10_REMOTE_03"
+		, "DLG_SETTINGS_10_REMOTE_04"
+		, "DLG_SETTINGS_10_REMOTE_05"
 
 		// Advanced
 		, "DLG_SETTINGS_A_ADVANCED_01"
@@ -1819,6 +1816,21 @@ function loadLangStrings(reload) {
 		, "DLG_SETTINGS_C_ADV_CACHE_13"
 		, "DLG_SETTINGS_C_ADV_CACHE_14"
 		, "DLG_SETTINGS_C_ADV_CACHE_15"
+
+		// Web UI
+		, "DLG_SETTINGS_9_WEBUI_01"
+		, "DLG_SETTINGS_9_WEBUI_02"
+		, "DLG_SETTINGS_9_WEBUI_03"
+		, "DLG_SETTINGS_9_WEBUI_05"
+		, "DLG_SETTINGS_9_WEBUI_07"
+		, "DLG_SETTINGS_9_WEBUI_09"
+		, "DLG_SETTINGS_9_WEBUI_10"
+		, "DLG_SETTINGS_9_WEBUI_12"
+
+		, "MM_OPTIONS_SHOW_CATEGORY"
+		, "MM_OPTIONS_SHOW_DETAIL"
+		, "MM_OPTIONS_SHOW_STATUS"
+		, "MM_OPTIONS_SHOW_TOOLBAR"
 
 		// Run Program
 		, "DLG_SETTINGS_C_ADV_RUN_01"
