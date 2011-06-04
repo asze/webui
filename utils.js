@@ -179,14 +179,14 @@ function encodeID(str) {
 			return String(this).pad(len, str || "0", type || "left");
 		},
 
-		"toFixedNR": function(numdec) {
+		"toFixedNR": function(numdec) { // non-rounding version of Number.toFixed
+			numdec = (Number(numdec) || 0);
 			if (numdec <= 0) {
-				return String(this);
+				numdec = -1;
 			}
-			else {
-				var res = this.toFixed(20);
-				return res.substring(0, res.length-(20-numdec));
-			}
+
+			var res = this.toFixed(20);
+			return res.substring(0, res.length - (20 - numdec));
 		},
 
 		"toFileSize": function(numdec, unit) {
