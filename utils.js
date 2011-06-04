@@ -43,6 +43,10 @@ function has(obj, key) {
 	return Object.prototype.hasOwnProperty.apply(obj, [key]);
 }
 
+function isEmpty(obj) {
+	return !Object.some(obj, Function.from(true));
+}
+
 function $chk(obj) {
 	return !!(obj || obj === 0);
 }

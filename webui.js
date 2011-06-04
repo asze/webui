@@ -1328,7 +1328,7 @@ var utWebUI = {
 		}
 
 		// Labels
-		if (visible && (actCat["cat_nlb"] || Object.some(actLbl, Function.from(true)))) {
+		if (visible && (actCat["cat_nlb"] || !isEmpty(actLbl))) {
 			visible = visible && (
 				(actCat["cat_nlb"] && group.cat["cat_nlb"]) ||
 				Object.some(actLbl, function(_, lbl) { return group.lbl[lbl]; })

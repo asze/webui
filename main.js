@@ -1461,8 +1461,8 @@ function loadLangStrings(reload) {
 	// -- Speed Tab
 
 	utWebUI.spdGraph.setLabels(
-		  L_("OV_COL_UPSPD")
-		, L_("OV_COL_DOWNSPD")
+		  L_("OV_COL_UPSPD", 1)
+		, L_("OV_COL_DOWNSPD", 1)
 	);
 
 	//--------------------------------------------------
