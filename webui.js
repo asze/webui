@@ -248,6 +248,7 @@ var utWebUI = {
 		, "gui.delete_to_trash": ""
 		, "gui.enable_comments": ""
 		, "gui.enable_ratings": ""
+		, "gui.enable_sidebar_buttons": ""
 		, "gui.graph_legend": ""
 		, "gui.graph_overhead": ""
 		, "gui.graph_tcp_rate_control": ""
@@ -990,7 +991,9 @@ var utWebUI = {
 		this.cacheID = json.torrentc;
 
 		// Extract Labels
-		this.loadLabels(Array.clone(json.label));
+		if (json.label) {
+			this.loadLabels(Array.clone(json.label));
+		}
 
 		// Extract Torrents
 		(function(deltaLists) {
