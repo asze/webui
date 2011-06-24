@@ -987,11 +987,12 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	border-top: 1px solid #D0D0D0;
 	bottom: 0;
 	height: 1.5em;
+	left: 0;
 	padding: 0.3em;
 	position: absolute;
 	right: 0;
 	text-align: right;
-	width: 100%;
+	white-space: nowrap;
 }
 
 .dlg-top {
@@ -1555,7 +1556,6 @@ NOTE: The following is an ugly hack, but a necessary one if we want the settings
 .CMenu ul li.sep {
 	border-top: 1px solid #D0D0D0;
 	font-size: 0;
-	height: 0;
 	line-height: 0;
 	margin: 2px 5px;
 }

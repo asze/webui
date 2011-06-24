@@ -95,7 +95,7 @@ var DialogManager = {
 
 					$me.hide(id);
 				});
-				
+
 				dlgFoot.grab(ele).appendText(" ");
 				if (btn.focus) btnFocus = ele;
 			})
