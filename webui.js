@@ -991,7 +991,7 @@ var utWebUI = {
 		this.cacheID = json.torrentc;
 
 		// Extract Labels
-		if (json.label) {
+		if (typeOf(json.label) === 'array') {
 			this.loadLabels(Array.clone(json.label));
 		}
 
