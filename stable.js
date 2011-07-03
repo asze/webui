@@ -915,9 +915,15 @@ var STable = new Class({
 
 	"sortCustomWrap": function(idx) {
 		if (this.sortCustom) {
-			return (function(x, y) {
-				this.sortCustom(idx, this.rowData[x.key].data, this.rowData[y.key].data);
-			}).bind(this);
+			if (!this.sortCustomArray) {
+				this.sortCustomArray = [];
+			}
+
+			return this.sortCustomArray[idx] || (this.sortCustomArray[idx] =
+				(function(x, y) {
+					return this.sortCustom(idx, this.rowData[x.key].data, this.rowData[y.key].data);
+				}).bind(this)
+			);
 		}
 	},
 
