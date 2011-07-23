@@ -843,8 +843,11 @@ var Flotr = (function(){
 	        var dummyDiv = new Element('div', {
 				"styles": {
 					'position': 'absolute',
-					'top': '-10000px',
-					'font-size': 'small'
+// uTorrent WebUI Patch - BEGIN
+//					'top': '-10000px',
+//					'font-size': 'small'
+					'top': '-10000px'
+// uTorrent WebUI Patch - END
 				},
 				"html": max_label,
 				"class": "gridLabel"

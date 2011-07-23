@@ -915,11 +915,11 @@ var STable = new Class({
 
 	"sortCustomWrap": function(idx) {
 		if (this.sortCustom) {
-			if (!this.sortCustomArray) {
-				this.sortCustomArray = [];
+			if (!this.sortCustomCache) {
+				this.sortCustomCache = [];
 			}
 
-			return this.sortCustomArray[idx] || (this.sortCustomArray[idx] =
+			return this.sortCustomCache[idx] || (this.sortCustomCache[idx] =
 				(function(x, y) {
 					return this.sortCustom(idx, this.rowData[x.key].data, this.rowData[y.key].data);
 				}).bind(this)
