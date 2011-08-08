@@ -2293,9 +2293,9 @@ var utWebUI = {
 	"addSettings": function(json, fn) {
 		var loadCookie = (function(newcookie) {
 			function safeCopy(objOrig, objNew) {
-				$each(objOrig, function(v, k) {
-					var tOrig = typeOf(objOrig[k]),
-						tNew = typeOf(objNew[k]);
+				for (var k in objNew) {
+					var tOrig = typeOf(objOrig[k]);
+					var tNew = typeOf(objNew[k]);
 
 					if (tOrig === tNew) {
 						if (tOrig === 'object') {
@@ -2305,12 +2305,15 @@ var utWebUI = {
 							objOrig[k] = objNew[k];
 						}
 					}
-				});
+					else if (!has(objOrig, k)) {
+						objOrig[k] = objNew[k];
+					}
+				}
 			}
 
 			var cookie = this.config;
 
-			// Pull out only data from received cookie that we already know about.
+			// For keys we know, only pull data out if it's of the correct type.
 			// Next best thing short of sanity checking every single value.
 			newcookie = newcookie || {};
 			safeCopy(cookie, newcookie);
