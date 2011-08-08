@@ -132,8 +132,8 @@ var utWebUI = {
 		, { "id": "ratio"        , "width": 50  , "type": TYPE_NUMBER       }
 		, { "id": "availability" , "width": 50  , "type": TYPE_NUMBER       }
 		, { "id": "label"        , "width": 80  , "type": TYPE_STRING       , "hidden" : true }
-		, { "id": "added"        , "width": 150 , "type": TYPE_NUMBER       , "hidden" : true , "align": ALIGN_LEFT }
-		, { "id": "completed"    , "width": 150 , "type": TYPE_NUMBER       , "hidden" : true , "align": ALIGN_LEFT }
+		, { "id": "added"        , "width": 150 , "type": TYPE_DATE         , "hidden" : true , "align": ALIGN_LEFT }
+		, { "id": "completed"    , "width": 150 , "type": TYPE_DATE         , "hidden" : true , "align": ALIGN_LEFT }
 		, { "id": "url"          , "width": 250 , "type": TYPE_STRING       , "hidden" : true }
 	],
 	"prsColDefs": [
@@ -171,7 +171,7 @@ var utWebUI = {
 		, { "id": "episode"  , "width": 70  , "type": TYPE_NUMBER , "hidden": true }
 		, { "id": "format"   , "width": 70  , "type": TYPE_NUMBER , "hidden": true, "align": ALIGN_LEFT }
 		, { "id": "codec"    , "width": 70  , "type": TYPE_NUMBER , "hidden": true, "align": ALIGN_LEFT }
-		, { "id": "date"     , "width": 150 , "type": TYPE_NUMBER , "align": ALIGN_LEFT }
+		, { "id": "date"     , "width": 150 , "type": TYPE_DATE   , "align": ALIGN_LEFT }
 		, { "id": "feed"     , "width": 130 , "type": TYPE_STRING , "hidden": true }
 		, { "id": "url"      , "width": 250 , "type": TYPE_STRING , "hidden": true }
 	],
@@ -3110,17 +3110,14 @@ var utWebUI = {
 
 		for (var i = (index || 0); i < len; i++) {
 			switch (this.trtColDefs[i].id) {
+				case "added":
+				case "completed":
 				case "label":
 				case "name":
 				case "peers":
 				case "seeds":
 				case "status":
 				case "url":
-				break;
-
-				case "added":
-				case "completed":
-					values[i] = (values[i] > 0) ? new Date(values[i]).toISOString() : "";
 				break;
 
 				case "availability":
@@ -4702,13 +4699,10 @@ var utWebUI = {
 
 		for (var i = (index || 0); i < len; i++) {
 			switch (this.fdColDefs[i].id) {
+				case "date":
 				case "fullname":
 				case "name":
 				case "url":
-				break;
-
-				case "date":
-					values[i] = (values[i] > 0) ? new Date(values[i]).toISOString() : "";
 				break;
 
 				case "codec":

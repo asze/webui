@@ -177,6 +177,7 @@ var STable = new Class({
 			map[TYPE_STRING] =
 				this.sortAlphaNumeric.bind(this);
 
+			map[TYPE_DATE] =
 			map[TYPE_NUMBER] =
 			map[TYPE_NUM_PROGRESS] =
 				this.sortNumeric.bind(this);
@@ -959,6 +960,7 @@ var STable = new Class({
 				r = Comparator.compareAlphaNumeric(m, n);
 			break;
 
+			case TYPE_DATE:
 			case TYPE_NUMBER:
 			case TYPE_NUM_PROGRESS:
 				r = Comparator.compareNumeric(m, n);
@@ -1308,6 +1310,10 @@ var STable = new Class({
 		var colh = this.colHeader;
 		this.colOrder.each(function(v, k) {
 			switch (colh[k].type) {
+				case TYPE_DATE:
+					rowc[v].set("text", (data[k] > 0 ? new Date(data[k]).toISOString() : ""));
+				break;
+
 				case TYPE_NUM_PROGRESS:
 					rowc[v].set("html", "").grab(progressBar(parseFloat(data[k]) || 0));
 				break;
@@ -1657,6 +1663,10 @@ var STable = new Class({
 		if (this.requiresRefresh || row.hidden || (row.rowIndex == -1) || !$(this.id + "-row-" + id)) return hasSortedChanged;
 		var r = this.tb.body.childNodes[row.rowIndex], cell = r.childNodes[this.colOrder[col]], fval = this.options.format(Array.clone(data), col);
 		switch (this.colHeader[col].type) {
+			case TYPE_DATE:
+				rowc[v].set("text", (fval > 0 ? new Date(fval).toISOString() : ""));
+			break;
+
 			case TYPE_NUM_PROGRESS:
 				cell.set("html", "").grab(progressBar(parseFloat(fval) || 0));
 			break;
