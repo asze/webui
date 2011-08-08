@@ -7,11 +7,15 @@ found in the LICENSE file.
 
 (function() {
 
-	// NOTE: Performance hack, since MooTools $ seems to run very slowly
 	var moo = document.id;
-	$ = function(el, nc) {
-		return moo(((typeof(el) === 'string') ? document.getElementById(el) : el), nc, document); 
+	$ = function(el, nc) { // MooTools $ is slow
+		return moo(((typeof(el) === 'string') ? (document.getElementById(el) || el) : el), nc, document); 
 	};
+
+	var hop = ({}).constructor.prototype.hasOwnProperty; // Make sure we have a safe hasOwnProperty
+	has = function(obj, key) {
+		return hop.apply(obj, [key]);
+	}
 
 })();
 
@@ -37,10 +41,6 @@ function ctrlToMeta(bindings) {
 	}
 
 	return bindings;
-}
-
-function has(obj, key) {
-	return Object.prototype.hasOwnProperty.apply(obj, [key]);
 }
 
 function isEmpty(obj) {
