@@ -19,7 +19,7 @@ body {
 	border: 0;
 	bottom: 0;
 	cursor: default;
-	font: small-caption;
+	font: menu;
 	height: 100%;
 	left: 0;
 	position: absolute;
@@ -28,8 +28,7 @@ body {
 }
 
 body.nosysfont {
-	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
-	font-size: 8pt;
+	font: normal 8pt Tahoma, Verdana, Arial, Helvetica, sans-serif;
 }
 
 a {
