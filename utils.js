@@ -17,6 +17,11 @@ found in the LICENSE file.
 		return hop.apply(obj, [key]);
 	}
 
+	var ftrue = Function.from(true);
+	isEmpty = function(obj) {
+		return !Object.some(obj, ftrue);
+	}
+
 })();
 
 function eventToKey(ev) {
@@ -41,10 +46,6 @@ function ctrlToMeta(bindings) {
 	}
 
 	return bindings;
-}
-
-function isEmpty(obj) {
-	return !Object.some(obj, Function.from(true));
 }
 
 function $chk(obj) {
