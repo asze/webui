@@ -813,7 +813,7 @@ var utWebUI = {
 }
 
 		if (!param) {
-			param = {"id": -1};
+			param = {"id": -1, "feed": -1};
 		}
 
 		Array.from(param.id).each(function(id) {
