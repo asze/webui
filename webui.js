@@ -3194,18 +3194,9 @@ var utWebUI = {
 						if (!ret) {
 							ret = ((statY & CONST.STATE_PAUSED) - (statX & CONST.STATE_PAUSED)); // paused sorts before unpaused
 							if (!ret) {
-								ret = (dataX[this.trtColDoneIdx] - dataY[this.trtColDoneIdx]); // lower progress sorts before higher progress
+								ret = ((statY & CONST.STATE_QUEUED) - (statX & CONST.STATE_QUEUED)); // paused sorts before unpaused
 								if (!ret) {
-									// some default tie-breaker
-									if (dataX[0] < dataY[0]) {
-										ret = -1;
-									}
-									else if (dataX[0] > dataY[0]) {
-										ret = 1;
-									}
-									else {
-										ret = 0;
-									}
+									ret = ((dataX[this.trtColDoneIdx] === 1000) - (dataY[this.trtColDoneIdx] === 1000)); // unfinished sorts before finished
 								}
 							}
 						}
