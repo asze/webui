@@ -922,7 +922,8 @@ var STable = new Class({
 
 			return this.sortCustomCache[idx] || (this.sortCustomCache[idx] =
 				(function(x, y) {
-					return this.sortCustom(idx, this.rowData[x.key].data, this.rowData[y.key].data);
+					var r = this.sortCustom(idx, this.rowData[x.key].data, this.rowData[y.key].data);
+					return (((r == 0) && (this.secIndex != this.sIndex)) ? this.sortSecondary(x, y) : r);
 				}).bind(this)
 			);
 		}
@@ -966,12 +967,6 @@ var STable = new Class({
 				r = Comparator.compareNumeric(m, n);
 			break;
 
-			case TYPE_CUSTOM:
-				if (this.sortCustom) {
-					r = this.sortCustom(index, this.rowData[x.key].data, this.rowData[y.key].data);
-					break;
-				}
-
 			case TYPE_NUM_ORDER:
 				r = Comparator.compareNumeric(m, n);
 				if (r != 0) {
@@ -981,6 +976,12 @@ var STable = new Class({
 						r = -1;
 				}
 			break;
+
+			case TYPE_CUSTOM:
+				if (this.sortCustom) {
+					r = this.sortCustom(index, this.rowData[x.key].data, this.rowData[y.key].data);
+					break;
+				}
 
 			default:
 				r = Comparator.compare(m, n);
