@@ -1664,7 +1664,7 @@ var STable = new Class({
 		var r = this.tb.body.childNodes[row.rowIndex], cell = r.childNodes[this.colOrder[col]], fval = this.options.format(Array.clone(data), col);
 		switch (this.colHeader[col].type) {
 			case TYPE_DATE:
-				rowc[v].set("text", (fval > 0 ? new Date(fval).toISOString() : ""));
+				cell.set("text", (fval > 0 ? new Date(fval).toISOString() : ""));
 			break;
 
 			case TYPE_NUM_PROGRESS:
