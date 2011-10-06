@@ -168,6 +168,27 @@ function encodeID(str) {
 			if (len < 0) return inp;
 			str = (new Array(MATH_CEIL(len / str.length) + 1)).join(str).substr(0, len);
 			return ((type == "left") ? (str + inp) : (inp + str));
+		},
+
+		"splitLimit": function(delim, count) {
+			count = MATH_FLOOR(count);
+
+			if (0 < count && count !== Infinity) {
+				var split = this.split(delim, count);
+				var len = split.length;
+				if (len === count) {
+					for (var i = 0, il = split.length; i < il; ++i) {
+						len += split[i].length;
+					}
+					if (len <= this.length) {
+						split.push(this.slice(len));
+					}
+				}
+				return split;
+			}
+			else {
+				return [this];
+			}
 		}
 
 	});

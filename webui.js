@@ -1863,7 +1863,7 @@ var utWebUI = {
 		var use_cust_alias = !!$("aerssfd-use_custom_alias").checked;
 
 		if (feed) {
-			var oldurl = feed[CONST.RSSFEED_URL].split("|");
+			var oldurl = feed[CONST.RSSFEED_URL].splitLimit("|", 1);
 
 			if (url !== [oldurl[1], oldurl[0]].pick()) {
 				deltaObj["url"] = url;
@@ -2734,7 +2734,7 @@ var utWebUI = {
 
 	"showAddEditRSSFeed": function(feedId) {
 		var feed = this.rssfeeds[feedId] || [];
-		var url = (feed[CONST.RSSFEED_URL] || "").split("|");
+		var url = (feed[CONST.RSSFEED_URL] || "").splitLimit("|", 1);
 		var use_cust_alias = ![feed[CONST.RSSFEED_USE_FEED_TITLE], true].pick();
 
 		$("aerssfd-id").set("value", feedId);
@@ -2783,7 +2783,7 @@ var utWebUI = {
 		var searchURLs = (this.settings["search_list"] || "").split("\r\n");
 
 		searchURLs = searchURLs.map(function(item) {
-			if (item && (item = item.split("|")[1])) {
+			if (item && (item = item.splitLimit("|", 1)[1])) {
 				if (!item.test(/%s/)) item += "%s";
 				return item.replace(/%v/, "utWebUI").replace(/%s/, searchQuery);
 			}
