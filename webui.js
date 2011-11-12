@@ -103,7 +103,8 @@ var utWebUI = {
 		"activeTorGroups": {
 			"cat": {"cat_all": 1},
 			"lbl": {}
-		}
+		},
+		"urlCookies": []
 	},
 	"torrentID": "", // selected torrent
 	"propID": "", // selected torrent (single)
@@ -3586,8 +3587,8 @@ var utWebUI = {
 
 	"addURL": function(param, fn) {
 		var urls = Array.from(param.url).map(function(url) {
-			return (encodeURIComponent((url || "").trim()) || undefined);
-		}).clean();
+			return (url && typeof(url) === 'string' ? url.trim() : undefined);
+		}, this).clean();
 		if (urls.length <= 0) return;
 
 		var count = 0;
@@ -3595,10 +3596,10 @@ var utWebUI = {
 			if (++count === urls.length) fn();
 		}) : undefined;
 
-		var val, tail = "";
+		var val, cookie, tail = "";
 
 		if ((val = encodeURIComponent(param.cookie || "").trim()))
-			tail += ":COOKIE:" + val;
+			cookie = encodeURIComponent(val);
 
 		if ((val = (parseInt(param.dir, 10) || 0)))
 			tail += "&download_dir=" + val;
@@ -3607,8 +3608,42 @@ var utWebUI = {
 			tail += "&path=" + encodeURIComponent(val); // TODO: Sanitize!
 
 		Array.each(urls, function(url) {
+			if (!url) return;
+
+			var curCookie;
+			if (!((cookie === null) || (typeof(cookie) === 'string'))) {
+				curCookie = this.retrieveURLCookie(url);
+				if (curCookie) {
+					curCookie = encodeURIComponent(curCookie);
+				}
+			}
+
+			url = encodeURIComponent(url) + (cookie || curCookie
+				? ":COOKIE:" + (cookie || curCookie)
+				: ""
+			);
+
 			this.request("action=add-url&s=" + url + tail, fnwrap);
 		}, this);
+	},
+
+	"retrieveURLCookie": function(url) {
+		if (!url || (url.indexOf(":COOKIE:") >= 0)) return "";
+
+		var cookies = (this.config.urlCookies || []);
+		var bestMatch = {"domain": ""};
+
+		for (var i = 0, il = cookies.length; i < il; ++i) {
+			var cookie = cookies[i];
+
+			if (cookie && cookie.data && (cookie.domain.length > bestMatch.domain.length)) {
+				if ((new RegExp("^[A-Za-z]+://([^/]*\\.|)" + cookie.domain + "(/|$)")).test(url)) {
+					bestMatch = cookie;
+				}
+			}
+		}
+
+		return (bestMatch.data || "");
 	},
 
 	"loadPeers": function() {
