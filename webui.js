@@ -6,7 +6,7 @@ found in the LICENSE file.
 */
 
 var LANG_LIST = LANG_LIST || {};
-var urlBase = window.location.pathname.substr(0, window.location.pathname.indexOf("/gui"));
+var urlBase = window.location.pathname.split("/gui", 1)[0].replace(/\/+$/, "");
 var guiBase = urlBase + "/gui/";
 var proxyBase = urlBase + "/proxy";
 var isGuest = window.location.pathname.test(/.*guest.html$/);
