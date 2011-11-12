@@ -357,7 +357,7 @@ function encodeID(str) {
 
 	});
 
-	Event.implement({
+	DOMEvent.implement({
 		"isRightClick": function() {
 			return !!(this.rightClick || (this.control && (this.event.button === 0) && Browser.Platform.mac));
 		},
