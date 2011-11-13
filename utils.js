@@ -181,7 +181,7 @@ function encodeID(str) {
 						len += split[i].length;
 					}
 					if (len <= this.length) {
-						split.push(this.slice(len));
+						split.push(this.slice(len + delim.length - 1));
 					}
 				}
 				return split;
