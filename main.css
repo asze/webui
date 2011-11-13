@@ -1101,6 +1101,10 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	width: 23em;
 }
 
+#dlgAddURL-cookie {
+	width: 16.5em !important;
+}
+
 
 /**************************************************
  * DIALOG: Properties
@@ -1124,7 +1128,7 @@ td.disabled, label.disabled, span.disabled, div.disabled {
  **************************************************/
 
 #dlgAddEditRSSFeed {
-	width: 32em;
+	width: 35em;
 }
 
 #dlgAddEditRSSFeed-head {
@@ -1132,7 +1136,11 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 }
 
 #dlgAddEditRSSFeed .dlg-body .tbox {
-	width: 20em;
+	width: 23em;
+}
+
+#dlgAddEditRSSFeed #aerssfd-cookie {
+	width: 16.5em !important;
 }
 
 
@@ -1430,7 +1438,6 @@ input[id="webui.uconnect_password"] {
 	width: 135px;
 }
 
-
 /* Advanced */
 
 #dlgSettings-advOptInput {
@@ -1494,6 +1501,23 @@ input[id="webui.guest"] {
 	float: right;
 	margin-left: 3px;
 	width: 135px;
+}
+
+/* Cookie Manager */
+
+#dlgSettings-cookieInput .line-cont {
+	margin-top: 2px;
+}
+
+#dlgSettings-cookieInput input {
+	vertical-align: baseline;
+}
+
+#dlgSettings-cookieDomain,
+#dlgSettings-cookieData {
+	left: 6em;
+	position: absolute;
+	right: 5px;
 }
 
 /* Hide Unknown Settings */

@@ -184,7 +184,9 @@ function setupGlobalEvents() {
 
 			"ctrl o": utWebUI.showAddTorrent.bind(utWebUI),
 			"ctrl p": utWebUI.showSettings.bind(utWebUI),
+//			"ctrl r": utWebUI.showRSSDownloader.bind(utWebUI),
 			"ctrl u": utWebUI.showAddURL.bind(utWebUI),
+
 			"f2": utWebUI.showAbout.bind(utWebUI),
 
 			"f4": utWebUI.toggleToolbar.bind(utWebUI),
@@ -686,10 +688,54 @@ function setupUserInterface() {
 	});
 
 	//--------------------------------------------------
+	// ADD/EDIT RSS FEED DIALOG
+	//--------------------------------------------------
+
+	// -- OK Button
+
+	$("DLG_ADDEDITRSSFEED_01").addEvent("click", function() {
+		utWebUI.feedAddEditOK();
+		DialogManager.hide("AddEditRSSFeed");
+	});
+
+	// -- Cancel Button
+
+	$("DLG_ADDEDITRSSFEED_02").addEvent("click", function(ev) {
+		DialogManager.hide("AddEditRSSFeed");
+	});
+
+	// -- Form Submission
+
+	$("dlgAddEditRSSFeed-form").addEvent("submit", Function.from(false));
+
+	// -- Detect Button
+
+	$("aerssfd-cookieDetect").addEvent("click", function(ev) {
+		var cookie = utWebUI.retrieveURLCookie($("aerssfd-url").get("value").trim());
+		if (cookie) {
+			$("aerssfd-cookie").set("value", cookie);
+		}
+	});
+
+	// -- Elements
+
+	$("aerssfd-use_custom_alias").addEvent(linkedEvent, function() {
+		_link(this, 0, ["aerssfd-custom_alias"]);
+	});
+
+	$("aerssfd-subscribe_0").addEvent("click", function() {
+		_link(this, 0, ["aerssfd-smart_ep"], null, true);
+	}).fireEvent("click");
+
+	$("aerssfd-subscribe_1").addEvent("click", function() {
+		_link(this, 0, ["aerssfd-smart_ep"]);
+	});
+
+	//--------------------------------------------------
 	// ADD TORRENT DIALOG
 	//--------------------------------------------------
 
-	// -- OK Button (File)
+	// -- OK Button
 
 	$("ADD_FILE_OK").addEvent("click", function() {
 		this.disabled = true;
@@ -705,7 +751,7 @@ function setupUserInterface() {
 		).submit();
 	});
 
-	// -- Cancel Button (File)
+	// -- Cancel Button
 
 	$("ADD_FILE_CANCEL").addEvent("click", function(ev) {
 		DialogManager.hide("Add");
@@ -741,45 +787,10 @@ function setupUserInterface() {
 	$("dlgAdd-form").set("target", uploadfrm.get("id"));
 
 	//--------------------------------------------------
-	// ADD/EDIT RSS FEED DIALOG
-	//--------------------------------------------------
-
-	// -- OK Button
-
-	$("DLG_ADDEDITRSSFEED_01").addEvent("click", function() {
-		utWebUI.feedAddEditOK();
-		DialogManager.hide("AddEditRSSFeed");
-	});
-
-	// -- Cancel Button
-
-	$("DLG_ADDEDITRSSFEED_02").addEvent("click", function(ev) {
-		DialogManager.hide("AddEditRSSFeed");
-	});
-
-	// -- Form Submission
-
-	$("dlgAddEditRSSFeed-form").addEvent("submit", Function.from(false));
-
-	// -- Elements
-
-	$("aerssfd-use_custom_alias").addEvent(linkedEvent, function() {
-		_link(this, 0, ["aerssfd-custom_alias"]);
-	});
-
-	$("aerssfd-subscribe_0").addEvent("click", function() {
-		_link(this, 0, ["aerssfd-smart_ep"], null, true);
-	}).fireEvent("click");
-
-	$("aerssfd-subscribe_1").addEvent("click", function() {
-		_link(this, 0, ["aerssfd-smart_ep"]);
-	});
-
-	//--------------------------------------------------
 	// ADD URL DIALOG
 	//--------------------------------------------------
 
-	// -- OK Button (URL)
+	// -- OK Button
 
 	$("ADD_URL_OK").addEvent("click", function() {
 		if ($("dlgAddURL-url").get("value").trim().length > 0) {
@@ -799,10 +810,19 @@ function setupUserInterface() {
 		}
 	});
 
-	// -- Cancel Button (URL)
+	// -- Cancel Button
 
 	$("ADD_URL_CANCEL").addEvent("click", function(ev) {
 		DialogManager.hide("AddURL");
+	});
+
+	// -- Detect Button
+
+	$("dlgAddURL-cookieDetect").addEvent("click", function(ev) {
+		var cookie = utWebUI.retrieveURLCookie($("dlgAddURL-url").get("value").trim());
+		if (cookie) {
+			$("dlgAddURL-cookie").set("value", cookie);
+		}
 	});
 
 	// -- Form Submission
@@ -955,21 +975,22 @@ function setupUserInterface() {
 
 	utWebUI.stpanes = new Tabs("dlgSettings-menu", {
 		"tabs": {
-			  "dlgSettings-General"     : ""
-			, "dlgSettings-UISettings"  : ""
-			, "dlgSettings-Directories" : ""
-			, "dlgSettings-Connection"  : ""
-			, "dlgSettings-Bandwidth"   : ""
-			, "dlgSettings-BitTorrent"  : ""
-			, "dlgSettings-TransferCap" : ""
-			, "dlgSettings-Queueing"    : ""
-			, "dlgSettings-Scheduler"   : ""
-			, "dlgSettings-Remote"      : ""
-			, "dlgSettings-Advanced"    : ""
-			, "dlgSettings-UIExtras"    : ""
-			, "dlgSettings-DiskCache"   : ""
-			, "dlgSettings-WebUI"       : ""
-			, "dlgSettings-RunProgram"  : ""
+			  "dlgSettings-General"       : ""
+			, "dlgSettings-UISettings"    : ""
+			, "dlgSettings-Directories"   : ""
+			, "dlgSettings-Connection"    : ""
+			, "dlgSettings-Bandwidth"     : ""
+			, "dlgSettings-BitTorrent"    : ""
+			, "dlgSettings-TransferCap"   : ""
+			, "dlgSettings-Queueing"      : ""
+			, "dlgSettings-Scheduler"     : ""
+			, "dlgSettings-Remote"        : ""
+			, "dlgSettings-Advanced"      : ""
+			, "dlgSettings-UIExtras"      : ""
+			, "dlgSettings-DiskCache"     : ""
+			, "dlgSettings-WebUI"         : ""
+			, "dlgSettings-RunProgram"    : ""
+			, "dlgSettings-CookieManager" : ""
 		},
 		"lazyshow": true,
 		"onChange": utWebUI.settingsPaneChange.bind(utWebUI)
@@ -1119,6 +1140,19 @@ function setupUserInterface() {
 	var advSize = $("dlgSettings-Advanced").getDimensions({computeSize: true});
 	utWebUI.advOptTable.resizeTo(advSize.x - 15, advSize.y - 70);
 
+	// -- Cookie Manager
+
+	utWebUI.ckMgrTable.create("dlgSettings-cookieList", utWebUI.ckMgrColDefs, Object.append({
+		"format": utWebUI.ckMgrFormatRow.bind(utWebUI),
+		"onColReset": utWebUI.ckMgrColReset.bind(utWebUI),
+		"onSelect": utWebUI.ckMgrSelect.bind(utWebUI)
+	}, utWebUI.defConfig.ckMgrTable));
+
+	$("dlgSettings-cookieSet").addEvent("click", utWebUI.ckMgrChanged.bind(utWebUI));
+
+	var ckSize = $("dlgSettings-CookieManager").getDimensions({computeSize: true});
+	utWebUI.ckMgrTable.resizeTo(ckSize.x - 15, ckSize.y - 90);
+
 	// -- Linked Controls
 
 	var linkedEvent = Browser.ie ? "click" : "change";
@@ -1240,6 +1274,11 @@ function setupUserInterface() {
 		, "webui.maxRows"
 		, "webui.updateInterval"
 		, "webui.useSysFont"
+
+		// Cookie Manager
+		, "dlgSettings-cookieDomain"
+		, "dlgSettings-cookieData"
+		, "dlgSettings-cookieSet"
 	]);
 
 	//--------------------------------------------------
@@ -1635,21 +1674,22 @@ function loadLangStrings(reload) {
 	//--------------------------------------------------
 
 	utWebUI.stpanes.setNames({
-		  "dlgSettings-General"     : L_("ST_CAPT_GENERAL")
-		, "dlgSettings-UISettings"  : L_("ST_CAPT_UI_SETTINGS")
-		, "dlgSettings-Directories" : L_("ST_CAPT_FOLDER")
-		, "dlgSettings-Connection"  : L_("ST_CAPT_CONNECTION")
-		, "dlgSettings-Bandwidth"   : L_("ST_CAPT_BANDWIDTH")
-		, "dlgSettings-BitTorrent"  : L_("ST_CAPT_BITTORRENT")
-		, "dlgSettings-TransferCap" : L_("ST_CAPT_TRANSFER_CAP")
-		, "dlgSettings-Queueing"    : L_("ST_CAPT_QUEUEING")
-		, "dlgSettings-Scheduler"   : L_("ST_CAPT_SCHEDULER")
-		, "dlgSettings-Remote"      : L_("ST_CAPT_REMOTE")
-		, "dlgSettings-Advanced"    : L_("ST_CAPT_ADVANCED")
-		, "dlgSettings-UIExtras"    : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_UI_EXTRAS") // TODO: Use CSS to indent instead of modifying the string directly...
-		, "dlgSettings-DiskCache"   : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_DISK_CACHE") // TODO: Use CSS to indent instead of modifying the string directly...
-		, "dlgSettings-WebUI"       : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_WEBUI") // TODO: Use CSS to indent instead of modifying the string directly...
-		, "dlgSettings-RunProgram"  : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_RUN_PROGRAM") // TODO: Use CSS to indent instead of modifying the string directly...
+		  "dlgSettings-General"       : L_("ST_CAPT_GENERAL")
+		, "dlgSettings-UISettings"    : L_("ST_CAPT_UI_SETTINGS")
+		, "dlgSettings-Directories"   : L_("ST_CAPT_FOLDER")
+		, "dlgSettings-Connection"    : L_("ST_CAPT_CONNECTION")
+		, "dlgSettings-Bandwidth"     : L_("ST_CAPT_BANDWIDTH")
+		, "dlgSettings-BitTorrent"    : L_("ST_CAPT_BITTORRENT")
+		, "dlgSettings-TransferCap"   : L_("ST_CAPT_TRANSFER_CAP")
+		, "dlgSettings-Queueing"      : L_("ST_CAPT_QUEUEING")
+		, "dlgSettings-Scheduler"     : L_("ST_CAPT_SCHEDULER")
+		, "dlgSettings-Remote"        : L_("ST_CAPT_REMOTE")
+		, "dlgSettings-Advanced"      : L_("ST_CAPT_ADVANCED")
+		, "dlgSettings-UIExtras"      : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_UI_EXTRAS") // TODO: Use CSS to indent instead of modifying the string directly...
+		, "dlgSettings-DiskCache"     : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_DISK_CACHE") // TODO: Use CSS to indent instead of modifying the string directly...
+		, "dlgSettings-WebUI"         : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_WEBUI") // TODO: Use CSS to indent instead of modifying the string directly...
+		, "dlgSettings-RunProgram"    : "&nbsp;&nbsp;&nbsp;&nbsp;" + L_("ST_CAPT_RUN_PROGRAM") // TODO: Use CSS to indent instead of modifying the string directly...
+		, "dlgSettings-CookieManager" : "&nbsp;&nbsp;&nbsp;&nbsp;" + "Cookie Manager" // @TODO: Localize // TODO: Use CSS to indent instead of modifying the string directly...
 	});
 
 	_loadStrings("text", [
@@ -1847,6 +1887,17 @@ function loadLangStrings(reload) {
 		"colText": {
 			  "name"  : L_("ST_COL_NAME", 1)
 			, "value" : L_("ST_COL_VALUE", 1)
+		}
+	});
+
+	// -- Cookie Manager
+
+	utWebUI.ckMgrTable.refreshRows();
+	utWebUI.ckMgrTable.setConfig({
+		"resetText": L_("MENU_RESET"),
+		"colText": { // TODO: Localize
+			  "domain" : "Domain"
+			, "data"   : "Data"
 		}
 	});
 

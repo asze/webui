@@ -100,7 +100,10 @@ found in the LICENSE file.
 						<label for="dlgAddURL-url">Torrent URL:</label>
 					</div>
 					<div class="line-cont">
-						<input type="text" id="dlgAddURL-cookie" class="tbox flr" />
+						<div class="flr">
+							<input type="text" id="dlgAddURL-cookie" class="tbox" />
+							<input type="button" id="dlgAddURL-cookieDetect" class="btn" value="Detect" />
+						</div>
 						<label for="dlgAddURL-cookie">Cookies:</label>
 					</div>
 
@@ -212,6 +215,13 @@ found in the LICENSE file.
 						<div class="line-cont">
 							<input type="text" id="aerssfd-url" class="tbox flr" />
 							<label for="aerssfd-url" id="DLG_ADDEDITRSSFEED_04"></label>
+						</div>
+						<div class="line-cont">
+							<div class="flr">
+								<input type="text" id="aerssfd-cookie" class="tbox" />
+								<input type="button" id="aerssfd-cookieDetect" class="btn" value="Detect" />
+							</div>
+							<label for="aerssfd-cookie">Cookies:</label>
 						</div>
 						<div class="line-cont">
 							<div class="fll">
@@ -1086,6 +1096,26 @@ found in the LICENSE file.
 								<input type="text" id="state_cmd" class="tbox wide" />
 							</div>
 							<div id="DLG_SETTINGS_C_ADV_RUN_06" style="margin-top: 5px; white-space: pre-wrap;"></div>
+						</fieldset>
+					</div>
+
+					<div id="dlgSettings-CookieManager" class="settings-pane">
+						<fieldset>
+							<legend id="">Cookie Manager</legend> <!-- TODO: Localize -->
+							<div id="dlgSettings-cookieList"></div>
+							<div id="dlgSettings-cookieInput">
+								<div class="line-cont">
+									<input type="text" id="dlgSettings-cookieDomain" class="tbox flr" />
+									<label for="dlgSettings-cookieDomain">Domain:</label>
+								</div>
+								<div class="line-cont">
+									<input type="text" id="dlgSettings-cookieData" class="tbox flr" />
+									<label for="dlgSettings-cookieData">Data:</label>
+								</div>
+								<div class="line-cont flr">
+									<input type="button" id="dlgSettings-cookieSet" class="btn" value="Set" />
+								</div>
+							</div>
 						</fieldset>
 					</div>
 				</div>

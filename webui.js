@@ -98,6 +98,10 @@ var utWebUI = {
 		"advOptTable": {
 			"rowMultiSelect": false
 		},
+		"ckMgrTable": {
+			"reverse": false,
+			"sIndex": -1
+		},
 		"activeSettingsPane": "",
 		"activeRssFeeds": {"rssfeed_all": 1},
 		"activeTorGroups": {
@@ -115,6 +119,7 @@ var utWebUI = {
 	"flsTable": new STable(),
 	"rssfdTable": new STable(),
 	"advOptTable": new STable(),
+	"ckMgrTable": new STable(),
 	"trtColDefs": [
 		  { "id": "name"         , "width": 220 , "type": TYPE_STRING       }
 		, { "id": "order"        , "width": 35  , "type": TYPE_NUM_ORDER    }
@@ -179,6 +184,10 @@ var utWebUI = {
 	"advOptColDefs": [
 		  { "id": "name"  , "width": 240, "type": TYPE_STRING }
 		, { "id": "value" , "width": 235, "type": TYPE_STRING }
+	],
+	"ckMgrColDefs": [
+		  { "id": "domain" , "width": 200, "type": TYPE_STRING }
+		, { "id": "data"   , "width": 275, "type": TYPE_STRING }
 	],
 	"trtColDoneIdx": -1, // automatically calculated based on this.trtColDefs
 	"trtColStatusIdx": -1, // automatically calculated based on this.trtColDefs
@@ -1860,8 +1869,13 @@ var utWebUI = {
 		var deltaObj = {"id": (feed ? feedId : -1)};
 
 		var url = $("aerssfd-url").get("value");
+		var cookie = $("aerssfd-cookie").get("value");
 		var alias = $("aerssfd-custom_alias").get("value");
 		var use_cust_alias = !!$("aerssfd-use_custom_alias").checked;
+
+		if (cookie) {
+			url += ":COOKIE:" + cookie;
+		}
 
 		if (feed) {
 			var oldurl = feed[CONST.RSSFEED_URL].splitLimit("|", 1);
@@ -2472,6 +2486,30 @@ var utWebUI = {
 		}
 	},
 
+	"getCookieItem": function(domain) {
+		if (domain in this.ckMgrTable.rowData) {
+			// TODO: Will need to rewrite bits of stable.js so that
+			//       there is a clean API for obtaining values...
+
+			return this.ckMgrTable.rowData[domain].data[1]; // TODO: Remove hard-coded index...
+		}
+	},
+
+	"setCookieItem": function(domain, data) {
+		if (undefined != data) {
+			if (domain in this.ckMgrTable.rowData) {
+				// TODO: Will need to rewrite bits of stable.js so that
+				//       there is a clean API for setting values...
+
+				this.ckMgrTable.rowData[domain].data[1] = data;
+				this.ckMgrTable.updateCell(domain, 1); // TODO: Remove hard-coded index...
+			}
+			else {
+				this.ckMgrTable.addRow([domain, data], domain);
+			}
+		}
+	},
+
 	"loadSettings": function() {
 		this.props.multi = {
 			"trackers": 0,
@@ -2498,6 +2536,16 @@ var utWebUI = {
 				else {
 					this.advOptTable.addRow([key, this.settings[key]], key);
 				}
+			}
+		}, this);
+
+		// Cookie manager
+		this.ckMgrTable.clearRows();
+		this.ckMgrSelect();
+
+		$each(this.config.urlCookies, function(cookie) {
+			if (cookie) {
+				this.setCookieItem(cookie.domain, cookie.data);
 			}
 		}, this);
 
@@ -2625,6 +2673,48 @@ var utWebUI = {
 			hasChanged = true;
 		}
 
+		{ // Cookie Manager
+			var cookies = [];
+			for (var domain in this.ckMgrTable.rowData) { // TODO: Cleanup! This is dirty!
+				cookies.push({
+					"domain" : domain,
+					"data": (this.getCookieItem(domain) || "")
+				});
+			}
+
+			var cookiesChanged = false;
+			var oldCookies = this.config.urlCookies;
+
+			if (cookies.length === oldCookies.length) {
+				function sortCookie(a, b) {
+					if (a.domain < b.domain) return -1;
+					if (a.domain > b.domain) return 1;
+					return 0;
+				}
+
+				oldCookies.sort(sortCookie);
+				cookies.sort(sortCookie);
+
+				for (var i = 0, il = oldCookies.length; i < il; ++i) {
+					if (!oldCookies[i] ||
+						oldCookies[i].domain !== cookies[i].domain ||
+						oldCookies[i].data !== cookies[i].data)
+					{
+						cookiesChanged = true;
+						break;
+					}
+				}
+			}
+			else {
+				cookiesChanged = true;
+			}
+
+			if (cookiesChanged) {
+				this.config.urlCookies = cookies;
+				hasChanged = true;
+			}
+		}
+
 		var str = "";
 
 		if (hasChanged && Browser.opera)
@@ -2735,12 +2825,16 @@ var utWebUI = {
 
 	"showAddEditRSSFeed": function(feedId) {
 		var feed = this.rssfeeds[feedId] || [];
-		var url = (feed[CONST.RSSFEED_URL] || "").splitLimit("|", 1);
+		var urlSplit = (feed[CONST.RSSFEED_URL] || "").splitLimit("|", 1);
 		var use_cust_alias = ![feed[CONST.RSSFEED_USE_FEED_TITLE], true].pick();
 
+		var url = [urlSplit[1], urlSplit[0]].pick().splitLimit(":COOKIE:", 1);
+		var alias = urlSplit[0];
+
 		$("aerssfd-id").set("value", feedId);
-		$("aerssfd-url").set("value", [url[1], url[0]].pick());
-		$("aerssfd-custom_alias").set("value", url[0]);
+		$("aerssfd-url").set("value", url[0]);
+		$("aerssfd-cookie").set("value", (url[1] || ""));
+		$("aerssfd-custom_alias").set("value", alias);
 		$("aerssfd-use_custom_alias").set("checked", use_cust_alias).fireEvent("change");
 
 		if (feed.length <= 0) {
@@ -4370,6 +4464,115 @@ var utWebUI = {
 		}
 	},
 
+	"ckMgrFormatRow": function(values, index) {
+		var useidx = $chk(index);
+		var len = (useidx ? (index + 1) : values.length);
+
+/*
+		for (var i = (index || 0); i < len; i++) {
+			switch (this.ckMgrColDefs[i].id) {
+				case "name":
+				case "value":
+					break;
+			}
+		}
+*/
+
+		if (useidx)
+			return values[index];
+		else
+			return values;
+	},
+
+	"ckMgrColReset": function() {
+		var config = {
+			  "colMask": 0
+			, "colOrder": this.ckMgrColDefs.map(function(col, idx) { return idx; })
+			, "colWidth": this.ckMgrColDefs.map(function(col, idx) { return col.width; })
+		};
+
+		this.ckMgrColDefs.each(function(col, idx) { if (!!col.hidden) config.colMask |= (1 << idx); });
+
+		this.ckMgrTable.setConfig(config);
+	},
+
+	"ckMgrSelect": function(ev, id) {
+		var data = this.getCookieItem(id);
+
+		if (undefined != data) {
+			// Item clicked
+			$("dlgSettings-cookieDomain").value = id;
+			$("dlgSettings-cookieData").value = data;
+		}
+		else {
+			$("dlgSettings-cookieDomain").value = "";
+			$("dlgSettings-cookieData").value = "";
+		}
+
+		if (ev && ev.isRightClick() && this.ckMgrTable.selectedRows.length > 0)
+			this.showCookieMenu.delay(0, this, ev);
+	},
+
+	"showCookieMenu": function(ev) {
+		if (isGuest || !ev.isRightClick()) return;
+
+		var domains = this.ckMgrTable.selectedRows;
+		if (domains.length <= 0) return;
+
+		var menuItems = [];
+
+		//--------------------------------------------------
+		// Cookies
+		//--------------------------------------------------
+
+		var cookieItems = [
+			["Delete", this.deleteCookies.bind(this)] // TODO: Localize
+		];
+
+		menuItems = menuItems.concat(cookieItems);
+
+		//--------------------------------------------------
+		// Miscellaneous Items
+		//--------------------------------------------------
+		menuItems = menuItems.concat([
+			  [CMENU_SEP]
+			, [L_("MENU_COPY"), this.ckMgrShowCopy.bind(this)]
+		]);
+
+		//--------------------------------------------------
+		// Draw Menu
+		//--------------------------------------------------
+
+		ContextMenu.clear();
+		ContextMenu.add.apply(ContextMenu, menuItems);
+		ContextMenu.show(ev.page);
+	},
+
+	"ckMgrShowCopy": function() {
+		this.showCopy(L_("MENU_COPY"), this.ckMgrTable.copySelection());
+	},
+
+	"deleteCookies": function() {
+		this.ckMgrTable.selectedRows.each(function(id) {
+			this.ckMgrTable.removeRow(id);
+		}, this);
+
+		this.ckMgrTable.refreshRows()
+
+		this.ckMgrSelect();
+	},
+
+	"ckMgrChanged": function() {
+		var domain = $("dlgSettings-cookieDomain").get("value");
+		var data = $("dlgSettings-cookieData").get("value");
+
+		this.setCookieItem(domain, data);
+
+		this.ckMgrTable.refreshRows();
+		this.ckMgrTable.scrollTo(domain);
+		this.ckMgrTable.selectRow(DOMEvent, {id:domain}); // TODO: Cleanup! This is dirty!
+	},
+
 	"restoreUI": function(bc) {
 		if ((bc != false) && !confirm("Are you sure that you want to restore the interface?")) return;
 		Overlay.msg('Reloading WebUI...');
@@ -4628,6 +4831,7 @@ var utWebUI = {
 		if (!isGuest) {
 			this.rssfdTable.setConfig({"rowMaxCount": max || virtRows, "rowMode": mode});
 			this.advOptTable.setConfig({"rowMaxCount": max || virtRows, "rowMode": mode});
+			this.ckMgrTable.setConfig({"rowMaxCount": max || virtRows, "rowMode": mode});
 		}
 	},
 
@@ -4638,6 +4842,7 @@ var utWebUI = {
 		if (!isGuest) {
 			this.rssfdTable.setConfig({"rowAlternate": enable});
 			this.advOptTable.setConfig({"rowAlternate": enable});
+			this.ckMgrTable.setConfig({"rowAlternate": enable});
 		}
 	},
 
@@ -4714,6 +4919,12 @@ var utWebUI = {
 				this.advOptTable.calcSize();
 				this.advOptTable.restoreScroll();
 				this.advOptTable.resizePads();
+			break;
+
+			case "dlgSettings-CookieManager":
+				this.ckMgrTable.calcSize();
+				this.ckMgrTable.restoreScroll();
+				this.ckMgrTable.resizePads();
 			break;
 		}
 
