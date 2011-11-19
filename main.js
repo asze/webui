@@ -199,7 +199,7 @@ function setupGlobalEvents() {
 				} else if (DialogManager.showing.length > 0) {
 					DialogManager.hideTopMost(true);
 				} else {
-					utWebUI.restoreUI();
+					utWebUI.showResetUI();
 				}
 			}
 		};
@@ -677,8 +677,8 @@ function setupUserInterface() {
 
 	DialogManager.init();
 
-	["About", "Add", "AddEditRSSFeed", "AddURL", "Props", "RSSDownloader", "Settings"].each(function(k) {
-		var isModal = ["AddEditRSSFeed", "Props"].contains(k);
+	["About", "Add", "AddEditRSSFeed", "AddURL", "Props", "ResetUI", "RSSDownloader", "Settings"].each(function(k) {
+		var isModal = ["AddEditRSSFeed", "Props", "ResetUI"].contains(k);
 		DialogManager.add(k, isModal, {
 			  "Add": function() { utWebUI.getDirectoryList(); }
 			, "AddURL": function() { utWebUI.getDirectoryList(); }
@@ -686,6 +686,33 @@ function setupUserInterface() {
 			, "Settings": function() { utWebUI.stpanes.onChange(); }
 		}[k]);
 	});
+
+	//--------------------------------------------------
+	// RESET UI DIALOG
+	//--------------------------------------------------
+
+	// -- OK Button
+
+	$("RESET_UI_OK").addEvent("click", function() {
+		utWebUI.resetUI();
+		DialogManager.hide("ResetUI");
+	});
+
+	// -- Cancel Button
+
+	$("RESET_UI_CANCEL").addEvent("click", function(ev) {
+		DialogManager.hide("ResetUI");
+	});
+
+	// -- Form Submission
+
+	$("dlgResetUI-form").addEvent("submit", Function.from(false));
+
+	// -- Elements
+
+	$("dlgResetUI-everything").addEvent(linkedEvent, function() {
+		_link(this, 0, ["dlgResetUI-interface", "dlgResetUI-grid", "dlgResetUI-cookie"], null, true);
+	}).fireEvent(linkedEvent);
 
 	//--------------------------------------------------
 	// ADD/EDIT RSS FEED DIALOG
@@ -1570,6 +1597,10 @@ function loadLangStrings(reload) {
 		, "DLG_RSSDOWNLOADER_01" : "DLG_BTN_CLOSE"
 		, "rssfilter_edit_cancel"   : "DLG_BTN_CANCEL"
 		, "rssfilter_edit_apply"    : "DLG_BTN_APPLY"
+
+		// Reset UI
+		, "RESET_UI_OK"     : "DLG_BTN_OK"
+		, "RESET_UI_CANCEL" : "DLG_BTN_CANCEL"
 
 		// Settings
 		, "DLG_SETTINGS_03" : "DLG_BTN_OK"

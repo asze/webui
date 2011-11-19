@@ -56,6 +56,43 @@ found in the LICENSE file.
 		</div>
 		<!-- About Dialog */ -->
 
+		<!-- /* Reset UI Dialog -->
+		<div id="dlgResetUI" class="dlg-window"><!-- TODO: Localize -->
+			<a href="#" class="dlg-close"></a>
+			<div id="dlgResetUI-head" class="dlg-head">Reset UI</div>
+			<form id="dlgResetUI-form" action="">
+				<div class="dlg-body">
+					Select the WebUI settings to reset.
+					<fieldset>
+						<legend id="">Options</legend>
+
+						<div class="line-cont">
+							<input type="checkbox" id="dlgResetUI-everything" />
+							<label id="" for="dlgResetUI-everything">Everything</label>
+						</div>
+
+						<div class="line-cont indent">
+							<input type="checkbox" id="dlgResetUI-interface" class="reset-subopt" checked="checked" />
+							<label id="" for="dlgResetUI-interface">User interface settings</label>
+						</div>
+						<div class="line-cont indent">
+							<input type="checkbox" id="dlgResetUI-grid" class="reset-subopt" checked="checked" />
+							<label id="" for="dlgResetUI-grid">Grid configuration</label>
+						</div>
+						<div class="line-cont indent">
+							<input type="checkbox" id="dlgResetUI-cookie" class="reset-subopt" />
+							<label id="" for="dlgResetUI-cookie">Managed cookies</label>
+						</div>
+					</fieldset>
+				</div>
+				<div class="dlg-foot">
+					<input type="submit" id="RESET_UI_OK" class="btn" />
+					<input type="button" id="RESET_UI_CANCEL" class="btn" />
+				</div>
+			</form>
+		</div>
+		<!-- Reset UI Dialog */ -->
+
 		<!-- /* Torrent Add Dialog -->
 		<div id="dlgAdd" class="dlg-window">
 			<a href="#" class="dlg-close"></a>

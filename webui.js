@@ -110,6 +110,21 @@ var utWebUI = {
 		},
 		"urlCookies": []
 	},
+	"resetConfigMap": {
+
+		"interface": [
+			"showDetails", "showDetailsIcons", "showCategories", "showToolbar", "showStatusBar"
+		  , "useSysFont", "updateInterval", "maxRows", "lang", "hSplit", "vSplit"
+		  , "activeSettingsPane", "activeRssFeeds", "activeTorGroups"
+		],
+
+		"grid": [
+			"torrentTable", "peerTable", "fileTable", "feedTable"
+		  , "advOptTable", "ckMgrTable"
+		],
+
+		"cookie": ["urlCookies"]
+	},
 	"torrentID": "", // selected torrent
 	"propID": "", // selected torrent (single)
 	"rssfilterId": "", // selected RSS filter
@@ -2864,12 +2879,64 @@ var utWebUI = {
 		DialogManager.show("AddURL");
 	},
 
+	"showResetUI": function(bc) {
+		DialogManager.show("ResetUI");
+
+		$("RESET_UI_OK").focus();
+	},
+
 	"showRSSDownloader": function() {
 		DialogManager.show("RSSDownloader");
 	},
 
 	"showSettings": function() {
 		DialogManager.show("Settings");
+	},
+
+	"resetUI": function() {
+		var opt;
+
+		if (!$("dlgResetUI-everything").checked) {
+			opt = [];
+
+			$$(".reset-subopt").each(function(ele) {
+				if (!!ele.checked) {
+					opt.push(String(ele.get("id")).replace(/dlgResetUI-/, ""));
+				}
+			});
+		}
+
+		utWebUI.performResetUI(opt);
+	},
+
+	"performResetUI": function(opt) {
+		if (opt) {
+			// Granular reset
+			if (!opt.length) {
+				// Nothing selected, nothing to delete
+				return;
+			}
+
+			var config = this.config;
+
+			opt.each(function(id) {
+				var itemList = this.resetConfigMap[id];
+
+				if (itemList) {
+					itemList.each(function (item) {
+						delete config[item];
+					});
+				}
+			}, this);
+		}
+		else {
+			// Global reset
+			this.config = {};
+		}
+
+		Overlay.msg('Reloading WebUI...');
+		window.removeEvents("unload");
+		this.saveConfig(false, function(){ window.location.reload(false); });
 	},
 
 	"searchExecute": function() {
@@ -4571,14 +4638,6 @@ var utWebUI = {
 		this.ckMgrTable.refreshRows();
 		this.ckMgrTable.scrollTo(domain);
 		this.ckMgrTable.selectRow(DOMEvent, {id:domain}); // TODO: Cleanup! This is dirty!
-	},
-
-	"restoreUI": function(bc) {
-		if ((bc != false) && !confirm("Are you sure that you want to restore the interface?")) return;
-		Overlay.msg('Reloading WebUI...');
-		window.removeEvents("unload");
-		this.config = {};
-		this.saveConfig(false, function(){ window.location.reload(false); });
 	},
 
 	"saveConfig": function(async, callback) {

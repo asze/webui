@@ -1145,6 +1145,20 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 
 
 /**************************************************
+ * DIALOG: About
+ **************************************************/
+
+#dlgResetUI {
+	width: 20em;
+	z-index: 100000 !important;
+}
+
+#dlgResetUI-head {
+	background-image: url(./images/reset.png);
+}
+
+
+/**************************************************
  * DIALOG: RSS Downloader
  **************************************************/
 
