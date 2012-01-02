@@ -47,7 +47,7 @@ var SPAN = new Element("span");
 function simpleClone(element, content) {
 	element = $(element.cloneNode(!!content));
 	element.uid = null;
-	$uid(element);
+	Slick.uidOf(element);
 	return element;
 }
 
