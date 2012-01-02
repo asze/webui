@@ -1527,11 +1527,16 @@ input[id="webui.guest"] {
 	vertical-align: baseline;
 }
 
-#dlgSettings-cookieDomain,
-#dlgSettings-cookieData {
+#dlgSettings-cookieDomain-wrap,
+#dlgSettings-cookieData-wrap {
 	left: 6em;
 	position: absolute;
-	right: 5px;
+	right: 10px;
+}
+
+#dlgSettings-cookieDomain,
+#dlgSettings-cookieData {
+	width: 100%;
 }
 
 /* Hide Unknown Settings */

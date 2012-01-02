@@ -1364,7 +1364,7 @@ function _unhideSetting(obj) {
 		if (!ele) return;
 
 		ele = ele.getParent();
-		while (ele && !ele.hasClass("settings-pane") && ele.getStyle("display") === "none") {
+		while (ele && !ele.hasClass("settings-pane") && ele.getStyle("display") !== "") {
 			ele.show();
 			ele = ele.getParent();
 		}
