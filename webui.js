@@ -363,6 +363,7 @@ var utWebUI = {
 			this.update.delay(0, this, (function() {
 				try {
 					this.refreshSelectedTorGroups();
+					resizeUI();
 					Overlay.hide();
 				}
 				catch (e) {
