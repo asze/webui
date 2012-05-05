@@ -4850,7 +4850,7 @@ window.addEvent('load', function(){
 })(window, document);
 
 // MooTools: the javascript framework.
-// Load this file's selection again by visiting: http://mootools.net/fa/b4e50ecb9f757ac1b814a55b8bd07f77 
+// Load this file's selection again by visiting: http://mootools.net/more/b4e50ecb9f757ac1b814a55b8bd07f77 
 // Or build this file again with packager using: packager build More/More More/Element.Measure More/Drag More/Assets
 /*
 ---
