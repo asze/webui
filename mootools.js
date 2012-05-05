@@ -20,7 +20,7 @@ description: The heart of MooTools.
 
 license: MIT-style license.
 
-copyright: Copyright (c) 2006-2010 [Valerio Proietti](http://mad4milk.net/).
+copyright: Copyright (c) 2006-2012 [Valerio Proietti](http://mad4milk.net/).
 
 authors: The MooTools production team (http://mootools.net/developers/)
 
@@ -36,8 +36,8 @@ provides: [Core, MooTools, Type, typeOf, instanceOf, Native]
 (function(){
 
 this.MooTools = {
-	version: '1.4.2',
-	build: '552dfd4704fccffed444e0211c50831a2bfe209f'
+	version: '1.4.5',
+	build: 'ab8ea8824dc3b24b6666867a2c4ed58ebb762cf0'
 };
 
 // typeOf, instanceOf
@@ -64,6 +64,9 @@ var instanceOf = this.instanceOf = function(item, object){
 		if (constructor === object) return true;
 		constructor = constructor.parent;
 	}
+	/*<ltIE8>*/
+	if (!item.hasOwnProperty) return false;
+	/*</ltIE8>*/
 	return item instanceof object;
 };
 
@@ -96,8 +99,9 @@ Function.prototype.overloadGetter = function(usePlural){
 	var self = this;
 	return function(a){
 		var args, result;
-		if (usePlural || typeof a != 'string') args = a;
+		if (typeof a != 'string') args = a;
 		else if (arguments.length > 1) args = arguments;
+		else if (usePlural) args = [a];
 		if (args){
 			result = {};
 			for (var i = 0; i < args.length; i++) result[args[i]] = self.call(this, args[i]);
@@ -254,14 +258,18 @@ var force = function(name, object, methods){
 			proto = prototype[key];
 
 		if (generic) generic.protect();
-
-		if (isType && proto){
-			delete prototype[key];
-			prototype[key] = proto.protect();
-		}
+		if (isType && proto) object.implement(key, proto.protect());
 	}
 
-	if (isType) object.implement(prototype);
+	if (isType){
+		var methodsEnumerable = prototype.propertyIsEnumerable(methods[0]);
+		object.forEachMethod = function(fn){
+			if (!methodsEnumerable) for (var i = 0, l = methods.length; i < l; i++){
+				fn.call(prototype, prototype[methods[i]], methods[i]);
+			}
+			for (var key in prototype) fn.call(prototype, prototype[key], key)
+		};
+	}
 
 	return force;
 };
@@ -432,8 +440,9 @@ Array.implement({
 
 	filter: function(fn, bind){
 		var results = [];
-		for (var i = 0, l = this.length >>> 0; i < l; i++){
-			if ((i in this) && fn.call(bind, this[i], i, this)) results.push(this[i]);
+		for (var value, i = 0, l = this.length >>> 0; i < l; i++) if (i in this){
+			value = this[i];
+			if (fn.call(bind, value, i, this)) results.push(value);
 		}
 		return results;
 	},
@@ -1910,8 +1919,14 @@ local.setDocument = function(document){
 
 	// contains
 	// FIXME: Add specs: local.contains should be different for xml and html documents?
-	features.contains = (root && this.isNativeCode(root.contains)) ? function(context, node){
+	var nativeRootContains = root && this.isNativeCode(root.contains),
+		nativeDocumentContains = document && this.isNativeCode(document.contains);
+
+	features.contains = (nativeRootContains && nativeDocumentContains) ? function(context, node){
 		return context.contains(node);
+	} : (nativeRootContains && !nativeDocumentContains) ? function(context, node){
+		// IE8 does not have .contains on document.
+		return context === node || ((context === document) ? document.documentElement : context).contains(node);
 	} : (root && root.compareDocumentPosition) ? function(context, node){
 		return context === node || !!(context.compareDocumentPosition(node) & 16);
 	} : function(context, node){
@@ -2306,7 +2321,7 @@ local.matchSelector = function(node, tag, id, classes, attributes, pseudos){
 
 	var i, part, cls;
 	if (classes) for (i = classes.length; i--;){
-		cls = node.getAttribute('class') || node.className;
+		cls = this.getAttribute(node, 'class');
 		if (!(cls && classes[i].regexp.test(cls))) return false;
 	}
 	if (attributes) for (i = attributes.length; i--;){
@@ -2492,7 +2507,7 @@ var pseudos = {
 	'nth-last-of-type': local.createNTHPseudo('lastChild', 'previousSibling', 'posNTHTypeLast', true),
 
 	'index': function(node, index){
-		return this['pseudo:nth-child'](node, '' + index + 1);
+		return this['pseudo:nth-child'](node, '' + (index + 1));
 	},
 
 	'even': function(node){
@@ -2564,10 +2579,6 @@ for (var p in pseudos) local['pseudo:' + p] = pseudos[p];
 
 var attributeGetters = local.attributeGetters = {
 
-	'class': function(){
-		return this.getAttribute('class') || this.className;
-	},
-
 	'for': function(){
 		return ('htmlFor' in this) ? this.htmlFor : this.getAttribute('for');
 	},
@@ -2602,7 +2613,7 @@ attributeGetters.MAXLENGTH = attributeGetters.maxLength = attributeGetters.maxle
 
 var Slick = local.Slick = (this.Slick || {});
 
-Slick.version = '1.1.6';
+Slick.version = '1.1.7';
 
 // Slick finder
 
@@ -2761,7 +2772,10 @@ new Type('Element', Element).mirror(function(name){
 if (!Browser.Element){
 	Element.parent = Object;
 
-	Element.Prototype = {'$family': Function.from('element').hide()};
+	Element.Prototype = {
+		'$constructor': Element,
+		'$family': Function.from('element').hide()
+	};
 
 	Element.mirror(function(name, method){
 		Element.Prototype[name] = method;
@@ -2876,16 +2890,17 @@ if (object[1] == 1) Elements.implement('splice', function(){
 	return result;
 }.protect());
 
-Elements.implement(Array.prototype);
+Array.forEachMethod(function(method, name){
+	Elements.implement(name, method);
+});
 
 Array.mirror(Elements);
 
 /*<ltIE8>*/
 var createElementAcceptsHTML;
 try {
-	var x = document.createElement('<input name=x>');
-	createElementAcceptsHTML = (x.name == 'x');
-} catch(e){}
+    createElementAcceptsHTML = (document.createElement('<input name=x>').name == 'x');
+} catch (e){}
 
 var escapeQuotes = function(html){
 	return ('' + html).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
@@ -2944,7 +2959,11 @@ Document.implement({
 			element: function(el, nocash){
 				Slick.uidOf(el);
 				if (!nocash && !el.$family && !(/^(?:object|embed)$/i).test(el.tagName)){
-					el._fireEvent = el.fireEvent;
+					var fireEvent = el.fireEvent;
+					// wrapping needed in IE7, or else crash
+					el._fireEvent = function(type, event){
+						return fireEvent(type, event);
+					};
 					Object.append(el, Element.Prototype);
 				}
 				return el;
@@ -3124,13 +3143,8 @@ Array.forEach([
 	properties[property.toLowerCase()] = property;
 });
 
-Object.append(properties, {
-	'html': 'innerHTML',
-	'text': (function(){
-		var temp = document.createElement('div');
-		return (temp.textContent == null) ? 'innerText': 'textContent';
-	})()
-});
+properties.html = 'innerHTML';
+properties.text = (document.createElement('div').textContent == null) ? 'innerText': 'textContent';
 
 Object.forEach(properties, function(real, key){
 	propertySetters[key] = function(node, value){
@@ -3179,7 +3193,7 @@ Object.append(propertySetters, {
 	},
 
 	'value': function(node, value){
-		node.value = value || '';
+		node.value = (value != null) ? value : '';
 	}
 
 });
@@ -3195,9 +3209,30 @@ try { el.type = 'button'; } catch(e){}
 if (el.type != 'button') propertySetters.type = function(node, value){
 	node.setAttribute('type', value);
 };
+el = null;
 /* </webkit> */
 
+/*<IE>*/
+var input = document.createElement('input');
+input.value = 't';
+input.type = 'submit';
+if (input.value != 't') propertySetters.type = function(node, type){
+	var value = node.value;
+	node.type = type;
+	node.value = value;
+};
+input = null;
+/*</IE>*/
+
 /* getProperty, setProperty */
+
+/* <ltIE9> */
+var pollutesGetAttribute = (function(div){
+	div.random = 'attribute';
+	return (div.getAttribute('random') == 'attribute');
+})(document.createElement('div'));
+
+/* <ltIE9> */
 
 Element.implement({
 
@@ -3206,8 +3241,21 @@ Element.implement({
 		if (setter){
 			setter(this, value);
 		} else {
-			if (value == null) this.removeAttribute(name);
-			else this.setAttribute(name, value);
+			/* <ltIE9> */
+			if (pollutesGetAttribute) var attributeWhiteList = this.retrieve('$attributeWhiteList', {});
+			/* </ltIE9> */
+
+			if (value == null){
+				this.removeAttribute(name);
+				/* <ltIE9> */
+				if (pollutesGetAttribute) delete attributeWhiteList[name];
+				/* </ltIE9> */
+			} else {
+				this.setAttribute(name, '' + value);
+				/* <ltIE9> */
+				if (pollutesGetAttribute) attributeWhiteList[name] = true;
+				/* </ltIE9> */
+			}
 		}
 		return this;
 	},
@@ -3220,6 +3268,18 @@ Element.implement({
 	getProperty: function(name){
 		var getter = propertyGetters[name.toLowerCase()];
 		if (getter) return getter(this);
+		/* <ltIE9> */
+		if (pollutesGetAttribute){
+			var attr = this.getAttributeNode(name), attributeWhiteList = this.retrieve('$attributeWhiteList', {});
+			if (!attr) return null;
+			if (attr.expando && !attributeWhiteList[name]){
+				var outer = this.outerHTML;
+				// segment by the opening tag and find mention of attribute name
+				if (outer.substr(0, outer.search(/\/?['"]?>(?![^<]*<['"])/)).indexOf(name) < 0) return null;
+				attributeWhiteList[name] = true;
+			}
+		}
+		/* </ltIE9> */
 		var result = Slick.getAttribute(this, name);
 		return (!result && !Slick.hasAttribute(this, name)) ? null : result;
 	},
@@ -3346,7 +3406,7 @@ var get = function(uid){
 };
 
 var clean = function(item){
-	var uid = item.uid;
+	var uid = item.uniqueNumber;
 	if (item.removeEvents) item.removeEvents();
 	if (item.clearAttributes) item.clearAttributes();
 	if (uid != null){
@@ -3392,7 +3452,7 @@ Element.implement({
 			if (node.clearAttributes){
 				node.clearAttributes();
 				node.mergeAttributes(element);
-				node.removeAttribute('uid');
+				node.removeAttribute('uniqueNumber');
 				if (node.options){
 					var no = node.options, eo = element.options;
 					for (var j = no.length; j--;) no[j].selected = eo[j].selected;
@@ -3492,60 +3552,77 @@ Element.Properties.tag = {
 
 };
 
-/*<!webkit>*/
-Element.Properties.html = (function(){
+Element.Properties.html = {
 
-	var tableTest = Function.attempt(function(){
-		var table = document.createElement('table');
-		table.innerHTML = '<tr><td></td></tr>';
-	});
+	set: function(html){
+		if (html == null) html = '';
+		else if (typeOf(html) == 'array') html = html.join('');
+		this.innerHTML = html;
+	},
 
-	var wrapper = document.createElement('div');
-
-	var translations = {
-		table: [1, '<table>', '</table>'],
-		select: [1, '<select>', '</select>'],
-		tbody: [2, '<table><tbody>', '</tbody></table>'],
-		tr: [3, '<table><tbody><tr>', '</tr></tbody></table>']
-	};
-	translations.thead = translations.tfoot = translations.tbody;
-
-	/*<ltIE9>*/
-	// technique by jdbarlett - http://jdbartlett.com/innershiv/
-	wrapper.innerHTML = '<nav></nav>';
-	var HTML5Test = wrapper.childNodes.length == 1;
-	if (!HTML5Test){
-		var tags = 'abbr article aside audio canvas datalist details figcaption figure footer header hgroup mark meter nav output progress section summary time video'.split(' '),
-			fragment = document.createDocumentFragment(), l = tags.length;
-		while (l--) fragment.createElement(tags[l]);
-		fragment.appendChild(wrapper);
+	erase: function(){
+		this.innerHTML = '';
 	}
-	/*</ltIE9>*/
 
-	var html = {
-		set: function(html){
-			if (typeOf(html) == 'array') html = html.join('');
+};
 
-			var wrap = (!tableTest && translations[this.get('tag')]);
-			/*<ltIE9>*/
-			if (!wrap && !HTML5Test) wrap = [0, '', ''];
-			/*</ltIE9>*/
-			if (wrap){
-				var first = wrapper;
-				first.innerHTML = wrap[1] + html + wrap[2];
-				for (var i = wrap[0]; i--;) first = first.firstChild;
-				this.empty().adopt(first.childNodes);
-			} else {
-				this.innerHTML = html;
-			}
-		}
-	};
+/*<ltIE9>*/
+// technique by jdbarlett - http://jdbartlett.com/innershiv/
+var div = document.createElement('div');
+div.innerHTML = '<nav></nav>';
+var supportsHTML5Elements = (div.childNodes.length == 1);
+if (!supportsHTML5Elements){
+	var tags = 'abbr article aside audio canvas datalist details figcaption figure footer header hgroup mark meter nav output progress section summary time video'.split(' '),
+		fragment = document.createDocumentFragment(), l = tags.length;
+	while (l--) fragment.createElement(tags[l]);
+}
+div = null;
+/*</ltIE9>*/
 
-	html.erase = html.set;
+/*<IE>*/
+var supportsTableInnerHTML = Function.attempt(function(){
+	var table = document.createElement('table');
+	table.innerHTML = '<tr><td></td></tr>';
+	return true;
+});
 
-	return html;
-})();
-/*</!webkit>*/
+/*<ltFF4>*/
+var tr = document.createElement('tr'), html = '<td></td>';
+tr.innerHTML = html;
+var supportsTRInnerHTML = (tr.innerHTML == html);
+tr = null;
+/*</ltFF4>*/
+
+if (!supportsTableInnerHTML || !supportsTRInnerHTML || !supportsHTML5Elements){
+
+	Element.Properties.html.set = (function(set){
+
+		var translations = {
+			table: [1, '<table>', '</table>'],
+			select: [1, '<select>', '</select>'],
+			tbody: [2, '<table><tbody>', '</tbody></table>'],
+			tr: [3, '<table><tbody><tr>', '</tr></tbody></table>']
+		};
+
+		translations.thead = translations.tfoot = translations.tbody;
+
+		return function(html){
+			var wrap = translations[this.get('tag')];
+			if (!wrap && !supportsHTML5Elements) wrap = [0, '', ''];
+			if (!wrap) return set.call(this, html);
+
+			var level = wrap[0], wrapper = document.createElement('div'), target = wrapper;
+			if (!supportsHTML5Elements) fragment.appendChild(wrapper);
+			wrapper.innerHTML = [wrap[1], html, wrap[2]].flatten().join('');
+			while (level--) target = target.firstChild;
+			this.empty().adopt(target.childNodes);
+			if (!supportsHTML5Elements) fragment.removeChild(wrapper);
+			wrapper = null;
+		};
+
+	})(Element.Properties.html.set);
+}
+/*</IE>*/
 
 /*<ltIE9>*/
 var testForm = document.createElement('form');
@@ -3577,11 +3654,11 @@ if (testForm.firstChild.value != 's') Element.Properties.value = {
 	}
 
 };
+testForm = null;
 /*</ltIE9>*/
 
 /*<IE>*/
-var el = document.createElement('div');
-if (el.getAttributeNode('id')) Element.Properties.id = {
+if (document.createElement('div').getAttributeNode('id')) Element.Properties.id = {
 	set: function(id){
 		this.id = this.getAttributeNode('id').value = id;
 	},
@@ -3617,6 +3694,15 @@ provides: Element.Style
 
 var html = document.html;
 
+//<ltIE9>
+// Check for oldIE, which does not remove styles when they're set to null
+var el = document.createElement('div');
+el.style.color = 'red';
+el.style.color = null;
+var doesNotRemoveStyles = el.style.color == 'red';
+el = null;
+//</ltIE9>
+
 Element.Properties.styles = {set: function(styles){
 	this.setStyles(styles);
 }};
@@ -3627,17 +3713,19 @@ var hasOpacity = (html.style.opacity != null),
 
 var setVisibility = function(element, opacity){
 	element.store('$opacity', opacity);
-	element.style.visibility = opacity > 0 ? 'visible' : 'hidden';
+	element.style.visibility = opacity > 0 || opacity == null ? 'visible' : 'hidden';
 };
 
 var setOpacity = (hasOpacity ? function(element, opacity){
 	element.style.opacity = opacity;
 } : (hasFilter ? function(element, opacity){
-	if (!element.currentStyle || !element.currentStyle.hasLayout) element.style.zoom = 1;
-	opacity = (opacity * 100).limit(0, 100).round();
-	opacity = (opacity == 100) ? '' : 'alpha(opacity=' + opacity + ')';
-	var filter = element.style.filter || element.getComputedStyle('filter') || '';
-	element.style.filter = reAlpha.test(filter) ? filter.replace(reAlpha, opacity) : filter + opacity;
+	var style = element.style;
+	if (!element.currentStyle || !element.currentStyle.hasLayout) style.zoom = 1;
+	if (opacity == null || opacity == 1) opacity = '';
+	else opacity = 'alpha(opacity=' + (opacity * 100).limit(0, 100).round() + ')';
+	var filter = style.filter || element.getComputedStyle('filter') || '';
+	style.filter = reAlpha.test(filter) ? filter.replace(reAlpha, opacity) : filter + opacity;
+	if (!style.filter) style.removeAttribute('filter');
 } : setVisibility));
 
 var getOpacity = (hasOpacity ? function(element){
@@ -3667,7 +3755,8 @@ Element.implement({
 
 	setStyle: function(property, value){
 		if (property == 'opacity'){
-			setOpacity(this, parseFloat(value));
+			if (value != null) value = parseFloat(value);
+			setOpacity(this, value);
 			return this;
 		}
 		property = (property == 'float' ? floatName : property).camelCase();
@@ -3681,6 +3770,11 @@ Element.implement({
 			value = Math.round(value);
 		}
 		this.style[property] = value;
+		//<ltIE9>
+		if ((value == '' || value == null) && doesNotRemoveStyles && this.style.removeAttribute){
+			this.style.removeAttribute(property);
+		}
+		//</ltIE9>
 		return this;
 	},
 
@@ -3702,16 +3796,17 @@ Element.implement({
 			var color = result.match(/rgba?\([\d\s,]+\)/);
 			if (color) result = result.replace(color[0], color[0].rgbToHex());
 		}
-		if (Browser.opera || (Browser.ie && isNaN(parseFloat(result)))){
-			if ((/^(height|width)$/).test(property)){
+		if (Browser.opera || Browser.ie){
+			if ((/^(height|width)$/).test(property) && !(/px$/.test(result))){
 				var values = (property == 'width') ? ['left', 'right'] : ['top', 'bottom'], size = 0;
 				values.each(function(value){
 					size += this.getStyle('border-' + value + '-width').toInt() + this.getStyle('padding-' + value).toInt();
 				}, this);
 				return this['offset' + property.capitalize()] - size + 'px';
 			}
-			if (Browser.opera && String(result).indexOf('px') != -1) return result;
-			if ((/^border(.+)Width|margin|padding/).test(property)) return '0px';
+			if (Browser.ie && (/^border(.+)Width|margin|padding/).test(property) && isNaN(parseFloat(result))){
+				return '0px';
+			}
 		}
 		return result;
 	},
@@ -3943,7 +4038,7 @@ if (!window.addEventListener){
 			return (this.get('tag') == 'input' && (type == 'radio' || type == 'checkbox')) ? 'propertychange' : 'change'
 		},
 		condition: function(event){
-			return !!(this.type != 'radio' || this.checked);
+			return this.type != 'radio' || (event.event.propertyName == 'checked' && this.checked);
 		}
 	}
 }
@@ -4458,7 +4553,7 @@ var Request = this.Request = new Class({
 		this.fireEvent('request');
 		xhr.send(data);
 		if (!this.options.async) this.onStateChange();
-		if (this.options.timeout) this.timer = this.timeout.delay(this.options.timeout, this);
+		else if (this.options.timeout) this.timer = this.timeout.delay(this.options.timeout, this);
 		return this;
 	},
 
@@ -4755,7 +4850,7 @@ window.addEvent('load', function(){
 })(window, document);
 
 // MooTools: the javascript framework.
-// Load this file's selection again by visiting: http://mootools.net/more/b4e50ecb9f757ac1b814a55b8bd07f77 
+// Load this file's selection again by visiting: http://mootools.net/fa/b4e50ecb9f757ac1b814a55b8bd07f77 
 // Or build this file again with packager using: packager build More/More More/Element.Measure More/Drag More/Assets
 /*
 ---
