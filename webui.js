@@ -3760,8 +3760,8 @@ var utWebUI = {
 
 		var val, cookie, tail = "";
 
-		if ((val = encodeURIComponent(param.cookie || "").trim()))
-			cookie = encodeURIComponent(val);
+		if ((val = (param.cookie || "").trim()))
+			cookie = val;
 
 		if ((val = (parseInt(param.dir, 10) || 0)))
 			tail += "&download_dir=" + val;
@@ -3775,15 +3775,12 @@ var utWebUI = {
 			var curCookie;
 			if (!((cookie === null) || (typeof(cookie) === 'string'))) {
 				curCookie = this.retrieveURLCookie(url);
-				if (curCookie) {
-					curCookie = encodeURIComponent(curCookie);
-				}
 			}
 
-			url = encodeURIComponent(url) + (cookie || curCookie
+			url = encodeURIComponent(url + (cookie || curCookie
 				? ":COOKIE:" + (cookie || curCookie)
 				: ""
-			);
+			));
 
 			this.request("action=add-url&s=" + url + tail, fnwrap);
 		}, this);
