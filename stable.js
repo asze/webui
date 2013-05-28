@@ -1418,7 +1418,9 @@ var STable = new Class({
 		dummy.children[0].set("html", "&nbsp;");
 		this.tb.body.appendChild(dummy);
 
-		this.tb.rowheight = dummy.getDimensions({computeSize: true}).totalHeight;
+		this.tb.rowheight = (
+			dummy.getDimensions({computeSize: true}).totalHeight || dummy.getDimensions().height
+		);
 
 		dummy.destroy();
 
