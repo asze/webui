@@ -640,20 +640,6 @@ var STable = new Class({
 		// COLUMN OPTIONS
 		//--------------------------------------------------
 
-		// -- Column Visibility
-		val = options.colMask; // bitfield
-		if (typeOf(val) === 'number') {
-			this.outOfDOM((function() {
-				for (var i = 0, bit = 1, len = this.cols; i < len; ++i, bit <<= 1) {
-					this.setColumnHidden(this.colOrder[i], !!(val & bit));
-				}
-			}).bind(this));
-
-			this.calcSize();
-
-			refresh = true;
-		}
-
 		// -- Column "Reset" Text
 		val = options.resetText; // string
 		if (typeOf(val) === 'string') {
@@ -709,6 +695,20 @@ var STable = new Class({
 			this.setAlignment();
 		}
 
+		// -- Column Visibility
+		val = options.colMask; // bitfield
+		if (typeOf(val) === 'number') {
+			this.outOfDOM((function() {
+				for (var i = 0, bit = 1, len = this.cols; i < len; ++i, bit <<= 1) {
+					this.setColumnHidden(this.colOrder[i], !!(val & bit));
+				}
+			}).bind(this));
+
+			this.calcSize();
+
+			refresh = true;
+		}
+
 		// -- Column Order
 		val = options.colOrder; // [ colMIdx, colNIdx, ... ]
 		if (typeOf(val) === 'array') {
@@ -733,15 +733,6 @@ var STable = new Class({
 			}
 		}
 
-		// -- Column Sort
-		val = options.colSort; // [colIdx, reverse]
-		if (typeOf(val) === 'array') {
-			this.outOfDOM((function() {
-				if ($chk(val[1])) this.options.reverse = !!val[1];
-				this.sort(val[0]);
-			}).bind(this));
-		}
-
 		// -- Column Width
 		val = options.colWidth; // [ col1Width, col2Width, ... ]
 		if (typeOf(val) === 'array') {
@@ -752,6 +743,15 @@ var STable = new Class({
 					}, this);
 				}).bind(this));
 			}
+		}
+
+		// -- Column Sort
+		val = options.colSort; // [colIdx, reverse]
+		if (typeOf(val) === 'array') {
+			this.outOfDOM((function() {
+				if ($chk(val[1])) this.options.reverse = !!val[1];
+				this.sort(val[0]);
+			}).bind(this));
 		}
 
 		//--------------------------------------------------

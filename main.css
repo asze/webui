@@ -41,8 +41,6 @@ img {
 }
 
 fieldset {
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
 	border: 1px solid #D0D0D0;
 	border-radius: 5px;
 	margin: 2px 0 3px 0;
@@ -260,8 +258,6 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 }
 
 .folder-tabs li > a {
-	-moz-border-radius: 5px 5px 0 0;
-	-webkit-border-radius: 5px 5px 0 0;
 	background-color: #DDDDDD;
 	border: 1px solid #B0B0B0;
 	border-bottom: 1px solid #868686;
@@ -911,10 +907,6 @@ td.disabled, label.disabled, span.disabled, div.disabled {
  **************************************************/
 
 .dlg-window {
-	-moz-border-radius: 5px 5px 0 0;
-	-moz-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.15), 0 0 6px rgba(0, 0, 0, 0.10);
-	-webkit-border-radius: 5px 5px 0 0;
-	-webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.15), 0 0 6px rgba(0, 0, 0, 0.10);
 	background-color: #FFFFFF;
 	border: 2px solid #C0C0C0;
 	border-bottom-color: #A0A0A0 !important;
@@ -931,8 +923,6 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 }
 
 .dlg-head {
-	-moz-border-radius: 4px 4px 0 0;
-	-webkit-border-radius: 4px 4px 0 0;
 	background: #F5F5F5 url(./images/blank.gif) no-repeat 0.3em 0.3em;
 	border-bottom: 1px solid #C0C0C0;
 	border-radius: 4px 4px 0 0;
@@ -995,8 +985,6 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 }
 
 .dlg-top {
-	-moz-box-shadow: 5px 3px 5px rgba(0, 0, 0, 0.25), 0 0 8px rgba(0, 0, 0, 0.15);
-	-webkit-box-shadow: 5px 3px 5px rgba(0, 0, 0, 0.25), 0 0 8px rgba(0, 0, 0, 0.15);
 	border-color: #989898;
 	border-bottom-color: #707070 !important;
 	border-right-color: #707070 !important;
@@ -1573,8 +1561,6 @@ NOTE: The following is an ugly hack, but a necessary one if we want the settings
  **************************************************/
 
 .CMenu {
-	-moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.30), 0 0 4px rgba(0, 0, 0, 0.20);
-	-webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.30), 0 0 4px rgba(0, 0, 0, 0.20);
 	background: #F8F8F8;
 	border: 1px solid #A7A6AA;
 	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.30), 0 0 4px rgba(0, 0, 0, 0.20);
