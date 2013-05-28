@@ -647,8 +647,9 @@ var STable = new Class({
 				for (var i = 0, bit = 1, len = this.cols; i < len; ++i, bit <<= 1) {
 					this.setColumnHidden(this.colOrder[i], !!(val & bit));
 				}
-				this.calcSize();
 			}).bind(this));
+
+			this.calcSize();
 
 			refresh = true;
 		}
