@@ -1072,6 +1072,10 @@ td.disabled, label.disabled, span.disabled, div.disabled {
 	width: 22em;
 }
 
+#dlgAdd-file {
+  height: 100%;
+}
+
 
 /**************************************************
  * DIALOG: Add URL
