@@ -126,12 +126,15 @@ var ContextMenu = {
 
 	"getElement": function() {
 		if (!this.element) {
-			this.element = (ELE_DIV.clone(false)
-				.addClass("CMenu")
-				.inject(document.body)
-				.addStopEvent("mousedown")
-				.grab(ELE_UL.clone(false))
-			);
+                        this.element =  (ELE_DIV.clone(false)
+                                .addClass("CMenu")
+                                .inject(document.body)
+                                .addStopEvent("mousedown")
+                                .grab(ELE_DIV.clone(false)
+                                        .setStyle("overflow-y","hidden")
+                                        .grab(ELE_UL.clone(false))
+                                )
+                        );
 		}
 
 		return this.element;
